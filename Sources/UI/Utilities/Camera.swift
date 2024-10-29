@@ -13,6 +13,7 @@ import CoreImage
 import CoreMedia
 import AVFoundation
 #if canImport(UIKit)
+  @_exported import Core
   import UIKit
 
   extension UIImage: Identifiable {
@@ -64,7 +65,8 @@ import AVFoundation
     private let barHeightFactor = 0.15
     public init(_ outputImage: Binding<UIImage?>) {
       _outputImage = outputImage
-      UIApplication.shared.keyWindow?.rootViewController?.view.backgroundColor = .clear
+
+      UIApplication.activeScene?.keyWindow?.rootViewController?.view.backgroundColor = UIColor.clear
     }
 
     //    @State private var showsTakePictureFeedback: Bool = false

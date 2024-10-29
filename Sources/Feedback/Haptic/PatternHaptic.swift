@@ -10,7 +10,10 @@ public extension AnyFeedback {
   ///   - sharpness: The sharpness of the feedback
   ///   - relativeTime: The relative time for the feedback, useful when combining haptic feedback
   ///   - duration: The duration of the feedback
-  static func haptic(intensity: Double, sharpness: Double, relativeTime: TimeInterval = 0, duration: TimeInterval = 0) -> Self {
+  static func haptic(intensity: Double,
+                     sharpness: Double,
+                     relativeTime: TimeInterval = 0,
+                     duration: TimeInterval = 0) -> Self {
     let event = HapticEvent.haptic(intensity: intensity, sharpness: sharpness, relativeTime: relativeTime, duration: duration)
     return .init(PatternHaptic(style: .events([event])))
   }

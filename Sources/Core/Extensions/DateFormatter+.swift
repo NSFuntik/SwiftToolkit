@@ -6,12 +6,34 @@
 #endif
 public extension ISO8601DateFormatter {
   /// A full ISO8601 date formatter that includes fractional seconds and full date with internet date-time.
-  static var full: ISO8601DateFormatter {
+  ///
+  /// - Parameter formatOptions: `.withInternetDateTime`\
+  ///  `.withFractionalSeconds`\
+  ///  `.withFullDate`
+  ///
+  static let full: ISO8601DateFormatter = {
     let isoDateFormatter = ISO8601DateFormatter()
     isoDateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds, .withFullDate]
     isoDateFormatter.timeZone = .autoupdatingCurrent
     return isoDateFormatter
-  }
+  }()
+
+  /// A common ISO8601 date formatter that includes full date with internet date-time.
+  /// - Parameter formatOptions: `.withInternetDateTime`
+  static let common: ISO8601DateFormatter = {
+    let formatter = ISO8601DateFormatter()
+    formatter.formatOptions = [.withInternetDateTime]
+    return formatter
+  }()
+
+  /// A common ISO8601 date formatter that includes fractional seconds and full date with internet date-time.
+  /// - Parameter formatOptions: `.withInternetDateTime`\
+  ///  `.withFractionalSeconds`\
+  static let commonWithSeconds: ISO8601DateFormatter = {
+    let formatter = ISO8601DateFormatter()
+    formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+    return formatter
+  }()
 }
 
 public extension DateFormatter {

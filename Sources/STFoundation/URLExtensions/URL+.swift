@@ -45,7 +45,7 @@ public extension URL {
   /// Returns a URL constructed by appending the given path to self.
   /// - Parameters:
   ///   - path: The path to add
-  ///   - directoryHint: A hint to whether this URL will point to a directory
+  ///   - isDirectory: A hint to whether this URL will point to a directory
   @available(iOS, introduced: 14, deprecated: 16, obsoleted: 16)
   func appending(
     path: String,

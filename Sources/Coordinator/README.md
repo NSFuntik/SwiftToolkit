@@ -1,4 +1,4 @@
-# SwiftUI Coordinator
+# Swift Toolkit Coordinator
 
 A powerful and flexible coordination system for managing navigation and modal presentations in SwiftUI applications.
 
@@ -169,6 +169,6 @@ final class SimpleCoordinator: CustomCoordinator {
 
 ## Requirements
 
-- iOS 16.0+
+- iOS 15.0+
 - Swift 5.5+
-- SwiftUI
+- SwiftUI ('Primary')

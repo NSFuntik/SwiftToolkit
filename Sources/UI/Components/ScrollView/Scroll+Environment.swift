@@ -22,9 +22,6 @@ extension EnvironmentValues {
 
   /// The way that scrollable content interacts with the software keyboard.
   ///
-  /// The default value is ``Backport.ScrollDismissesKeyboardMode.automatic``. Use the
-  /// ``View.backport.scrollDismissesKeyboard(_:)`` modifier to configure this
-  /// property.
   public var scrollDismissesKeyboardMode: ScrollDismissesKeyboardMode {
     get { self[BackportKeyboardDismissKey.self] }
     set { self[BackportKeyboardDismissKey.self] = newValue }
@@ -33,7 +30,7 @@ extension EnvironmentValues {
   /// A Boolean value that indicates whether any scroll views associated
   /// with this environment allow scrolling to occur.
   ///
-  /// The default value is `true`. Use the ``View.backport.scrollDisabled(_:)``
+  /// The default value is `true`. Use the ``View.scrollDisabled(_:)``
   /// modifier to configure this property.
   public var isScrollEnabled: Bool {
     get { self[BackportScrollEnabledKey.self] }

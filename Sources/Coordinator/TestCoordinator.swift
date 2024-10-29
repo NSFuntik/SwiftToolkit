@@ -9,7 +9,7 @@
 
   // MARK: - TestCoordinator
 
-  final class TestCoordinator: NavigationModalCoordinator {
+final class TestCoordinator: NavigationModalCoordinator {
     enum Screen: ScreenProtocol {
       case screen1
       case screen2

@@ -1,10 +1,3 @@
-//
-//  File.swift
-//
-//
-//  Created by Dmitry Mikhaylov on 07.05.2024.
-//
-
 import Foundation
 
 // A simple implementation of an asynchronous passthrough subject using Swift's concurrency features.

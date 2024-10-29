@@ -18,6 +18,7 @@ public extension View {
 }
 
 public extension Audio {
+  /// Plays the audio file
   @MainActor
   func play() async throws {
     try await AudioPlayer.shared.play(audio: self)
@@ -26,7 +27,8 @@ public extension Audio {
 
 // MARK: - AudioPlayerEnvironmentKey
 
-public struct AudioPlayerEnvironmentKey: EnvironmentKey {
+public struct AudioPlayerEnvironmentKey: @preconcurrency EnvironmentKey {
+  @MainActor
   public static let defaultValue = AudioPlayer.shared
 }
 
@@ -40,19 +42,13 @@ public extension EnvironmentValues {
 // MARK: - AudioFeedback
 
 public struct AudioFeedback: Feedback, ViewModifier {
-  // Properties
-
   @State var audio: Audio
 
   @Environment(\.audioPlayer) private var player
 
-  // Lifecycle
-
-  init(audio: Audio) {
+  public init(audio: Audio) {
     self._audio = State(wrappedValue: audio)
   }
-
-  // Content
 
   public func body(content: Content) -> some View {
     content

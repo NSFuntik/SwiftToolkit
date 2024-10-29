@@ -38,7 +38,7 @@ open class KeychainWrapper {
   /// Create a standard instance of this class.
   private convenience init() {
     let id = Bundle.main.bundleIdentifier
-    let fallback = "com.swiftkit.keychain"
+    let fallback = "dev.swifttoolkit.keychain"
     self.init(serviceName: id ?? fallback)
   }
 
