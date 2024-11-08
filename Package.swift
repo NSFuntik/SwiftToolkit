@@ -22,6 +22,7 @@ let package = Package(
     .library(name: "DI", targets: ["DI"]),
     .library(name: "Logger", targets: ["Logger"]),
     .library(name: "SFSymbols", targets: ["SFSymbols"]),
+    .library(name: "CoreDatabase", targets: ["CoreDatabase"]),
 
     // Umbrella module
     .library(
@@ -43,16 +44,18 @@ let package = Package(
     .target(name: "DI"),
     .target(name: "Logger", dependencies: ["Core"]),
     .target(name: "SFSymbols", dependencies: ["Core", "DI"]),
+    .target(name: "CoreDatabase", dependencies: ["Core"]),
 
     // Umbrella target
-    .target(name: "SwiftToolkit",
-            dependencies: [
-              "Core",
-              "UI",
-              "Coordinator",
-              "STCoding",
-              "DI",
-              "Logger",
-            ]),
-
+    .target(
+      name: "SwiftToolkit",
+      dependencies: [
+        "Core",
+        "UI",
+        "Coordinator",
+        "STCoding",
+        "DI",
+        "Logger",
+        "CoreDatabase",
+      ]),
   ])

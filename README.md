@@ -4,15 +4,15 @@ A comprehensive SwiftUI toolkit for iOS and macOS development.
 
 ## Modules
 
-- **Core**: Core functionality and extensions
-- **Foundation**: Foundation extensions and utilities
-- **UI**: SwiftUI components and utilities
-- **Coordinator**: Navigation coordination system
-- **Feedback**: Haptic, audio, and visual feedback
-- **STCoding**: Advanced encoding and decoding
-- **DI**: Dependency injection system
-- **Logger**: Logging system with filtering
-- **SFSymbols**: Type-safe SF Symbols integration
+- **[Core](Sources/Core/README.md)**: Core functionality and extensions
+- **[Foundation](Sources/STFoundation/README.md)**: Foundation extensions and utilities
+- **[UI](Sources/UI/README.md)**: SwiftUI components and utilities
+- **[Coordinator](Sources/Coordinator/README.md)**: Navigation coordination system
+- **[Feedback](Sources/Feedback/README.md)**: Haptic, audio, and visual feedback
+- **[STCoding](Sources/STCoding/README.md)**: Advanced encoding and decoding
+- **[DI](Sources/DI/README.md)**: Dependency injection system
+- **[Logger](Sources/Logger/README.md)**: Logging system with filtering
+- **[SFSymbols](Sources/SFSymbols/README.md)**: Type-safe SF Symbols integration
 
 ## Installation
 
@@ -39,7 +39,9 @@ targets: [
             .product(name: "STCoding", package: "SwiftToolkit"),
             .product(name: "DI", package: "SwiftToolkit"),
             .product(name: "Logger", package: "SwiftToolkit"),
-            .product(name: "SFSymbols", package: "SwiftToolkit")
+            .product(name: "SFSymbols", package: "SwiftToolkit"),
+            .product(name: "CoreDatabase", package: "SwiftToolkit")
+
         ]
     )
 ]
@@ -59,7 +61,7 @@ Each module has its own README with detailed usage instructions:
 - [DI](Sources/DI/README.md)
 - [Logger](Sources/Logger/README.md)
 - [SFSymbols](Sources/SFSymbols/README.md)
-
+- [CoreDatabase](Sources/CoreDatabase/CoreDatabase.md)
 ## Requirements
 
 - iOS 15.0+
@@ -70,4 +72,6 @@ Each module has its own README with detailed usage instructions:
 
 ## License
 
+This project is released into the public domain under The Unlicense.
 
+See the [LICENSE](LICENSE) file for more details.
