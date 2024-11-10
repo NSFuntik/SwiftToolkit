@@ -1,6 +1,6 @@
-import SwiftUI
 import Combine
 import Foundation
+import SwiftUI
 
 // MARK: - Navigation
 
@@ -76,13 +76,15 @@ public final class Navigation<C: Coordinator>: ObservableObject {
   public func callAsFunction() -> C { object! }
 }
 
+// MARK: - Coordinator
+
 /// A protocol that defines the core functionality of a coordinator
 ///
 /// Coordinators are responsible for managing navigation flow and modal presentations
 /// in a SwiftUI application. They maintain state and provide methods for navigation
 /// control.
 @MainActor
-public protocol Coordinator: ObservableObject, Hashable {}
+public protocol Coordinator: ObservableObject, Hashable, Sendable {}
 
 public extension Coordinator {
   /// Hashes the coordinator instance
@@ -192,7 +194,7 @@ public extension View {
   }
 }
 
-// MARK: - Navigation Protocol
+// MARK: - ScreenProtocol
 
 /// A protocol that defines the requirements for a screen in a navigation flow
 public protocol ScreenProtocol: Hashable {}
@@ -369,10 +371,10 @@ public final class NavigationState: ObservableObject {
   }
 
   @MainActor private func closeKeyboard() {
-#if os(macOS)
-    NSApp.keyWindow?.makeFirstResponder(nil)
-#else
-    UIApplication.shared.resignFirstResponder()
-#endif
+    #if os(macOS)
+      NSApp.keyWindow?.makeFirstResponder(nil)
+    #else
+      UIApplication.shared.resignFirstResponder()
+    #endif
   }
 }

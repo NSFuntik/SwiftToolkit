@@ -12,13 +12,13 @@ let package = Package(
   ],
   products: [
     // Core modules
-    .library(name: "STCore", targets: ["Core"]),
+    .library(name: "SwiftToolkitCore", targets: ["Core"]),
 
     // Feature modules
     .library(name: "UI", targets: ["UI"]),
     .library(name: "Coordinator", targets: ["Coordinator"]),
     .library(name: "Feedback", targets: ["Feedback"]),
-    .library(name: "STCoding", targets: ["STCoding"]),
+    .library(name: "SwiftToolkitCoding", targets: ["STCoding"]),
     .library(name: "DI", targets: ["DI"]),
     .library(name: "Logger", targets: ["Logger"]),
     .library(name: "SFSymbols", targets: ["SFSymbols"]),
