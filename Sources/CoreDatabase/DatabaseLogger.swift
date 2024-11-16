@@ -4,30 +4,35 @@
 //
 //  Provides comprehensive logging functionality for database operations.
 
-import os
-import os.log
 import Combine
 import CoreData
 import Foundation
+import os
 
 // MARK: - DatabaseLogger
 
 /// Enhanced protocol for comprehensive database logging
 public protocol DatabaseLogger {
   /// Logs a database operation with detailed context
-  func logDatabaseOperation(_ operation: String,
-                            duration: TimeInterval,
-                            context: [String: Any]?)
+  func logDatabaseOperation(
+    _ operation: String,
+    duration: TimeInterval,
+    context: [String: Any]?
+  )
 
   /// Logs an error with comprehensive details
-  func logError(_ error: Error,
-                context: [String: Any]?,
-                severity: DatabaseLogSeverity)
+  func logError(
+    _ error: Error,
+    context: [String: Any]?,
+    severity: DatabaseLogSeverity
+  )
 
   /// Handles specific types of database errors with custom logic
-  func handleError(_ error: Error,
-                   context: NSManagedObjectContext?,
-                   recoveryStrategy: DatabaseErrorRecoveryStrategy?)
+  func handleError(
+    _ error: Error,
+    context: NSManagedObjectContext?,
+    recoveryStrategy: DatabaseErrorRecoveryStrategy?
+  )
 }
 
 // MARK: - DatabaseLogSeverity
@@ -57,13 +62,17 @@ public final class DefaultDatabaseLogger: DatabaseLogger {
   private let logger: Logger
 
   public init(label: String = "com.apple.CoreData") {
-    self.logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.apple.CoreData",
-                         category: "CoreDatabase")
+    self.logger = Logger(
+      subsystem: Bundle.main.bundleIdentifier ?? "com.apple.CoreData",
+      category: "CoreDatabase"
+    )
   }
 
-  public func logDatabaseOperation(_ operation: String,
-                                   duration: TimeInterval,
-                                   context: [String: Any]? = nil) {
+  public func logDatabaseOperation(
+    _ operation: String,
+    duration: TimeInterval,
+    context: [String: Any]? = nil
+  ) {
     let logMessage = "Operation: \(operation), Duration: \(duration) ms"
     logger.info("\(logMessage, privacy: .public)")
 
@@ -72,9 +81,11 @@ public final class DefaultDatabaseLogger: DatabaseLogger {
     }
   }
 
-  public func logError(_ error: Error,
-                       context: [String: Any]? = nil,
-                       severity: DatabaseLogSeverity = .error) {
+  public func logError(
+    _ error: Error,
+    context: [String: Any]? = nil,
+    severity: DatabaseLogSeverity = .error
+  ) {
     let errorDescription = error.localizedDescription
 
     switch severity {
@@ -96,14 +107,18 @@ public final class DefaultDatabaseLogger: DatabaseLogger {
     }
   }
 
-  public func handleError(_ error: Error,
-                          context: NSManagedObjectContext?,
-                          recoveryStrategy: DatabaseErrorRecoveryStrategy? = .rollback) {
+  public func handleError(
+    _ error: Error,
+    context: NSManagedObjectContext?,
+    recoveryStrategy: DatabaseErrorRecoveryStrategy? = .rollback
+  ) {
     switch error {
     case let databaseError as DatabaseError:
-      handleSpecificDatabaseError(databaseError,
-                                  context: context,
-                                  recoveryStrategy: recoveryStrategy)
+      handleSpecificDatabaseError(
+        databaseError,
+        context: context,
+        recoveryStrategy: recoveryStrategy
+      )
     default:
       logError(error, context: ["NSManagedObjectContext": context as Any], severity: .critical)
     }
@@ -112,7 +127,8 @@ public final class DefaultDatabaseLogger: DatabaseLogger {
   private func handleSpecificDatabaseError(
     _ error: DatabaseError,
     context: NSManagedObjectContext?,
-    recoveryStrategy: DatabaseErrorRecoveryStrategy? = nil) {
+    recoveryStrategy: DatabaseErrorRecoveryStrategy? = nil
+  ) {
     switch error {
     case let .validationFailed(reason):
       logError(error, context: ["Validation Reason": reason], severity: .warning)

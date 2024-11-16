@@ -1,17 +1,16 @@
-
 #if canImport(UIKit)
-  import UIKit
+import UIKit
 #else
-  import AppKit
+import AppKit
 #endif
-public extension ISO8601DateFormatter {
+extension ISO8601DateFormatter {
   /// A full ISO8601 date formatter that includes fractional seconds and full date with internet date-time.
   ///
   /// - Parameter formatOptions: `.withInternetDateTime`\
   ///  `.withFractionalSeconds`\
   ///  `.withFullDate`
   ///
-  static let full: ISO8601DateFormatter = {
+  public static let full: ISO8601DateFormatter = {
     let isoDateFormatter = ISO8601DateFormatter()
     isoDateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds, .withFullDate]
     isoDateFormatter.timeZone = .autoupdatingCurrent
@@ -20,7 +19,7 @@ public extension ISO8601DateFormatter {
 
   /// A common ISO8601 date formatter that includes full date with internet date-time.
   /// - Parameter formatOptions: `.withInternetDateTime`
-  static let common: ISO8601DateFormatter = {
+  public static let common: ISO8601DateFormatter = {
     let formatter = ISO8601DateFormatter()
     formatter.formatOptions = [.withInternetDateTime]
     return formatter
@@ -29,23 +28,24 @@ public extension ISO8601DateFormatter {
   /// A common ISO8601 date formatter that includes fractional seconds and full date with internet date-time.
   /// - Parameter formatOptions: `.withInternetDateTime`\
   ///  `.withFractionalSeconds`\
-  static let commonWithSeconds: ISO8601DateFormatter = {
+  public static let commonWithSeconds: ISO8601DateFormatter = {
     let formatter = ISO8601DateFormatter()
     formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
     return formatter
   }()
 }
 
-public extension DateFormatter {
+extension DateFormatter {
   /// Initializes a `DateFormatter` with a given date format. Defaults to an ISO8601 string representation of the current date and time.
-  convenience init(dateFormat: String = ISO8601DateFormatter.string(from: .now, timeZone: .autoupdatingCurrent)) {
+  public convenience init(dateFormat: String = ISO8601DateFormatter.string(from: .now, timeZone: .autoupdatingCurrent))
+  {
     self.init()
     locale = Locale.current
     self.dateFormat = dateFormat
   }
 
   /// A static property that provides a `DateFormatter` configured to display short time.
-  static let timeFormatter = {
+  public static let timeFormatter = {
     let formatter = DateFormatter()
     formatter.dateStyle = .none
     formatter.timeStyle = .short
@@ -53,7 +53,7 @@ public extension DateFormatter {
   }()
 
   /// A static property that provides a `DateFormatter` for displaying relative dates.
-  static let relativeDateFormatter = {
+  public static let relativeDateFormatter = {
     let relativeDateFormatter = DateFormatter()
     relativeDateFormatter.timeStyle = .none
     relativeDateFormatter.dateStyle = .full
@@ -63,7 +63,7 @@ public extension DateFormatter {
   }()
 
   /// Converts a given number of seconds into a time string of format "HH:mm:ss" or "MM:ss".
-  static func timeString(_ seconds: Int) -> String {
+  public static func timeString(_ seconds: Int) -> String {
     let hour = Int(seconds) / 3600
     let minute = Int(seconds) / 60 % 60
     let second = Int(seconds) % 60
@@ -74,11 +74,12 @@ public extension DateFormatter {
   }
 }
 
-public extension Date {
+extension Date {
   /// Initializes a `Date` from a string using a specified format or a default ISO8601 format. Throws an error if the date cannot be parsed.
-  init?(
+  public init?(
     string dateString: String?,
-    format: String? = nil) throws {
+    format: String? = nil
+  ) throws {
     guard let dateString, let format else {
       throw CocoaError(.coderValueNotFound)
     }
@@ -97,14 +98,14 @@ public extension Date {
   }
 
   /// A string representation of the date in ISO8601 format.
-  var string: String {
+  public var string: String {
     let string = ISO8601DateFormatter.full.string(from: self)
     debugPrint(string)
     return string
   }
 
   /// A string representation of the current time in "HH:mm" format.
-  var time: String {
+  public var time: String {
     let format = "HH:mm"
     let formatter = DateFormatter()
     formatter.locale = Locale.current
@@ -115,41 +116,44 @@ public extension Date {
   }
 }
 
-public extension Date {
+extension Date {
   /// Returns the difference in a specific calendar component between the date and another date.
-  func fullDistance(
+  public func fullDistance(
     from date: Date,
     resultIn component: Calendar.Component,
-    calendar: Calendar = .current) -> Int? {
+    calendar: Calendar = .current
+  ) -> Int? {
     calendar.dateComponents([component], from: self, to: date).value(for: component)
   }
 
   /// Calculates the distance between two dates in specified calendar component.
-  func distance(
+  public func distance(
     from date: Date,
     only component: Calendar.Component,
-    calendar: Calendar = .current) -> Int {
+    calendar: Calendar = .current
+  ) -> Int {
     let days1 = calendar.component(component, from: self)
     let days2 = calendar.component(component, from: date)
     return days1 - days2
   }
 
   /// Checks if a specific calendar component of the date is the same as another date.
-  func hasSame(
+  public func hasSame(
     _ component: Calendar.Component,
-    as date: Date) -> Bool {
+    as date: Date
+  ) -> Bool {
     distance(from: date, only: component) == 0
   }
 }
 
-public extension Date {
+extension Date {
   /// Timestamp in milliseconds since January 1, 1970.
-  var timestamp: Int64 {
+  public var timestamp: Int64 {
     return Int64(self.timeIntervalSince1970 * 1000)
   }
 
   /// Current timestamp in milliseconds since January 1, 1970.
-  static var currentTimeStamp: Int64 {
+  public static var currentTimeStamp: Int64 {
     return Int64(Date().timeIntervalSince1970 * 1000)
   }
 }

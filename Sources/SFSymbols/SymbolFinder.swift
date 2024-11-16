@@ -9,8 +9,8 @@ import DI
 import Foundation
 import NaturalLanguage
 
-public extension DI {
-  static let symbolFinder = Key<MLSymbolFinder>()
+extension DI {
+  public static let symbolFinder = Key<MLSymbolFinder>()
 }
 
 // MARK: - MLSymbolFinder
@@ -148,7 +148,11 @@ public final class MLSymbolFinder {
       return exactMatch
     }
 
-    guard let result = MLSymbolFinder.default.findMostSimilarSymbolInternal(to: input.replacingOccurrences(of: ".", with: " ")) else {
+    guard
+      let result = MLSymbolFinder.default.findMostSimilarSymbolInternal(
+        to: input.replacingOccurrences(of: ".", with: " ")
+      )
+    else {
       return nil
     }
     // debugPrint("охожий символ: \(result)")
@@ -217,8 +221,9 @@ public final class MLSymbolFinder {
     var tokens = [String]()
     let tokenizer = NLTokenizer(unit: .sentence)
     tokenizer.string = text
-    tokenizer.enumerateTokens(in: text.startIndex ..< text.endIndex) { tokenRange, _ in
-      tokens.append(String(text[tokenRange])); return true
+    tokenizer.enumerateTokens(in: text.startIndex..<text.endIndex) { tokenRange, _ in
+      tokens.append(String(text[tokenRange]))
+      return true
     }
     return tokens
   }
@@ -271,7 +276,7 @@ final class BKTree: Codable {
     if distance <= tolerance {
       results.append(node.word)
     }
-    for i in (distance - tolerance) ... (distance + tolerance) {
+    for i in (distance - tolerance)...(distance + tolerance) {
       if let child = node.children[i] {
         searchNode(child, word, tolerance, &results)
       }
@@ -284,20 +289,21 @@ final class BKTree: Codable {
     let n = a.count
     let m = b.count
 
-    var currentRow = [Int](0 ... m)
+    var currentRow = [Int](0...m)
     var previousRow = [Int](repeating: 0, count: m + 1)
 
-    for i in 1 ... n {
+    for i in 1...n {
       previousRow = currentRow
       currentRow = [Int](repeating: 0, count: m + 1)
       currentRow[0] = i
 
-      for j in 1 ... m {
+      for j in 1...m {
         let cost = a[i - 1] == b[j - 1] ? 0 : 1
         currentRow[j] = min(
           previousRow[j] + 1,
           currentRow[j - 1] + 1,
-          previousRow[j - 1] + cost)
+          previousRow[j - 1] + cost
+        )
       }
     }
 

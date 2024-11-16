@@ -5,8 +5,8 @@
 //  Created by Dmitry Mikhailov on 29.10.2024.
 //
 
-import SwiftUI
 import Foundation
+import SwiftUI
 
 // MARK: - ModalStyle
 
@@ -24,12 +24,12 @@ public enum ModalStyle {
   ///
   /// - Note: This style doesn't interfere with native navigation or modal presentation flow
   case overlay
-  
-#if os(macOS)
+
+  #if os(macOS)
   public static var fullScreen: ModalStyle { .sheet }
-#else
+  #else
   public static var fullScreen: ModalStyle { .cover }
-#endif
+  #endif
 }
 
 // MARK: - ModalProtocol
@@ -59,12 +59,12 @@ public protocol ModalProtocol: Hashable, Identifiable {
   var style: ModalStyle { get }
 }
 
-public extension ModalProtocol {
+extension ModalProtocol {
   /// Default implementation returns .sheet style
-  var style: ModalStyle { .sheet }
+  public var style: ModalStyle { .sheet }
 
   /// Default implementation uses hash value as identifier
-  var id: Int { hashValue }
+  public var id: Int { hashValue }
 }
 
 extension ModalProtocol {
@@ -128,21 +128,26 @@ public enum PresentationResolve {
   case replaceCurrent
 }
 
-public extension ModalCoordinator {
+extension ModalCoordinator {
   /// Present a flow modally over the current navigation.
   ///
   /// - Parameters:
   ///   - modalFlow: The modal flow to present
   ///   - resolve: The resolution strategy for handling existing presentations
   @MainActor
-  func present(_ modalFlow: Modal,
-               resolve: PresentationResolve = .overAll) {
-    present(.init(
-      modalFlow: modalFlow,
-      destination: { [unowned self] in
-        AnyView(self.destination(for: modalFlow))
-      }),
-    resolve: resolve)
+  public func present(
+    _ modalFlow: Modal,
+    resolve: PresentationResolve = .overAll
+  ) {
+    present(
+      .init(
+        modalFlow: modalFlow,
+        destination: { [unowned self] in
+          AnyView(self.destination(for: modalFlow))
+        }
+      ),
+      resolve: resolve
+    )
   }
 }
 
@@ -170,8 +175,10 @@ public struct ModalPresentation {
   /// - Parameters:
   ///   - modalFlow: The modal flow to present
   ///   - destination: Closure returning the view to present
-  init(modalFlow: any ModalProtocol,
-       destination: @escaping () -> AnyView) {
+  init(
+    modalFlow: any ModalProtocol,
+    destination: @escaping () -> AnyView
+  ) {
     self.modalFlow = modalFlow
 
     if let coordinator = modalFlow.coordinator {
@@ -204,8 +211,9 @@ private struct ModalModifer: ViewModifier {
       state?.modalPresented?.modalFlow.style == style
     } set: { [weak state] _ in
       if let presented = state?.modalPresented,
-         let overlayPresented = presented.coordinator.state.modalPresented,
-         overlayPresented.modalFlow.style == .overlay {
+        let overlayPresented = presented.coordinator.state.modalPresented,
+        overlayPresented.modalFlow.style == .overlay
+      {
         presented.coordinator.state.modalPresented = nil
       } else {
         state?.modalPresented = nil
@@ -217,7 +225,8 @@ private struct ModalModifer: ViewModifier {
     content
       .overlay {
         if let presented = state.modalPresented,
-           presented.modalFlow.style == .overlay {
+          presented.modalFlow.style == .overlay
+        {
           presented.destination()
             .coordinateSpace(name: CoordinateSpace.modal)
         }
@@ -226,22 +235,25 @@ private struct ModalModifer: ViewModifier {
         state.modalPresented?.destination()
           .coordinateSpace(name: CoordinateSpace.modal)
       }
-#if os(iOS)
-      .fullScreenCover(isPresented: isPresentedBinding(.cover)) {
-        state.modalPresented?.destination()
-          .coordinateSpace(name: CoordinateSpace.modal)
-      }
-#endif
-      .alert(state.alerts.last?.title ?? "",
-             isPresented: Binding(
-               get: { state.alerts.last != nil },
-               set: { _ in
-                 if !state.alerts.isEmpty {
-                   state.alerts.removeLast()
-                 }
-               }),
-             actions: state.alerts.last?.actions ?? { AnyView(EmptyView()) },
-             message: state.alerts.last?.message ?? { AnyView(EmptyView()) })
+      #if os(iOS)
+    .fullScreenCover(isPresented: isPresentedBinding(.cover)) {
+      state.modalPresented?.destination()
+      .coordinateSpace(name: CoordinateSpace.modal)
+    }
+      #endif
+      .alert(
+        state.alerts.last?.title ?? "",
+        isPresented: Binding(
+          get: { state.alerts.last != nil },
+          set: { _ in
+            if !state.alerts.isEmpty {
+              state.alerts.removeLast()
+            }
+          }
+        ),
+        actions: state.alerts.last?.actions ?? { AnyView(EmptyView()) },
+        message: state.alerts.last?.message ?? { AnyView(EmptyView()) }
+      )
   }
 }
 
@@ -268,7 +280,8 @@ extension NavigationState {
     init<A: View, M: View>(
       title: String,
       actions: @escaping () -> A,
-      message: @escaping () -> M) {
+      message: @escaping () -> M
+    ) {
       self.title = title
       self.actions = { AnyView(actions()) }
       self.message = { AnyView(message()) }
@@ -276,12 +289,12 @@ extension NavigationState {
   }
 }
 
-public extension View {
+extension View {
   /// Adds modal presentation capabilities to a view
   /// - Parameter coordinator: The coordinator managing modal presentations
   /// - Returns: A view with modal presentation capabilities
   @MainActor
-  func withModal<C: Coordinator>(_ coordinator: C) -> some View {
+  public func withModal<C: Coordinator>(_ coordinator: C) -> some View {
     modifier(ModalModifer(state: coordinator.state))
       .environmentObject(coordinator.weakReference)
   }
@@ -289,11 +302,11 @@ public extension View {
 
 // MARK: - Alert Presentation
 
-public extension Coordinator {
+extension Coordinator {
   /// The default title used for alerts when no specific title is provided
   @usableFromInline internal nonisolated static var defaultAlertTitle: String {
-    Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String ??
-      Bundle.main.infoDictionary?["CFBundleName"] as? String ?? ""
+    Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String ?? Bundle.main.infoDictionary?["CFBundleName"]
+      as? String ?? ""
   }
 
   /// Presents an alert with custom actions and message
@@ -301,9 +314,11 @@ public extension Coordinator {
   ///   - title: The title of the alert
   ///   - message: A closure that returns the message view
   ///   - actions: A closure that returns the alert actions view
-  func alert<A: View, M: View>(_ title: String = Self.defaultAlertTitle,
-                               @ViewBuilder _ message: @escaping () -> M,
-                               @ViewBuilder actions: @escaping () -> A) {
+  public func alert<A: View, M: View>(
+    _ title: String = Self.defaultAlertTitle,
+    @ViewBuilder _ message: @escaping () -> M,
+    @ViewBuilder actions: @escaping () -> A
+  ) {
     state.alerts.append(.init(title: title, actions: actions, message: message))
   }
 
@@ -312,8 +327,10 @@ public extension Coordinator {
   ///   - title: The title of the alert
   ///   - message: A closure that returns the message view
   @MainActor
-  func alert<M: View>(_ title: String = Self.defaultAlertTitle,
-                      @ViewBuilder _ message: @escaping () -> M) {
+  public func alert<M: View>(
+    _ title: String = Self.defaultAlertTitle,
+    @ViewBuilder _ message: @escaping () -> M
+  ) {
     state.alerts.append(.init(title: title, actions: { Button("OK") {} }, message: message))
   }
 
@@ -322,8 +339,10 @@ public extension Coordinator {
   ///   - title: The title of the alert
   ///   - message: The message string
   @MainActor
-  func alert(_ title: String = Self.defaultAlertTitle,
-             message: String) {
+  public func alert(
+    _ title: String = Self.defaultAlertTitle,
+    message: String
+  ) {
     state.alerts.append(.init(title: title, actions: { Button("OK") {} }, message: { Text(message) }))
   }
 
@@ -333,9 +352,11 @@ public extension Coordinator {
   ///   - message: The message string
   ///   - actions: A closure that returns the alert actions view
   @MainActor
-  func alert<A: View>(_ title: String = Self.defaultAlertTitle,
-                      message: String,
-                      @ViewBuilder actions: @escaping () -> A) {
+  public func alert<A: View>(
+    _ title: String = Self.defaultAlertTitle,
+    message: String,
+    @ViewBuilder actions: @escaping () -> A
+  ) {
     state.alerts.append(.init(title: title, actions: actions, message: { Text(message) }))
   }
 }

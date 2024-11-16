@@ -53,14 +53,14 @@ public struct ScrollDismissesKeyboardMode: Hashable, CustomStringConvertible {
   let dismissMode: DismissMode
 
   #if os(iOS)
-    var scrollViewDismissMode: UIScrollView.KeyboardDismissMode {
-      switch dismissMode {
-      case .automatic: .none
-      case .immediately: .onDrag
-      case .interactively: .interactive
-      case .never: .none
-      }
+  var scrollViewDismissMode: UIScrollView.KeyboardDismissMode {
+    switch dismissMode {
+    case .automatic: .none
+    case .immediately: .onDrag
+    case .interactively: .interactive
+    case .never: .none
     }
+  }
   #endif
 }
 

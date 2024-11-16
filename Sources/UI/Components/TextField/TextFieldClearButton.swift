@@ -7,26 +7,32 @@
 
 import SwiftUI
 
-public extension View {
+extension View {
   /// Adds a clear button to the view, allowing users to easily clear the text input.
   ///
   /// - Parameter text: A binding to the text input that the clear button will operate on.
   /// - Returns: A view with the clear button added when the text is not empty.
-  @ViewBuilder func
+  @ViewBuilder
+  public func
     clearButton(
       isActive: Bool = true,
       _ text: Binding<String?>,
-      onClear: @escaping () -> Void = {}) -> some View {
+      onClear: @escaping () -> Void = {}
+    ) -> some View
+  {
     if isActive {
       modifier(TextFieldClearButton(fieldText: text, onClear: onClear))
     }
   }
 
-  @ViewBuilder func
+  @ViewBuilder
+  public func
     clearButton(
       isActive: Bool = true,
       _ text: Binding<String>,
-      onClear: (() -> Void)? = nil) -> some View {
+      onClear: (() -> Void)? = nil
+    ) -> some View
+  {
     if isActive {
       modifier(TextFieldClearButton(fieldText: text, onClear: onClear))
     }
@@ -39,14 +45,16 @@ public extension View {
 public struct TextFieldClearButton: ViewModifier {
   public init(
     fieldText: Binding<String?>,
-    onClear: @escaping () -> Void) {
+    onClear: @escaping () -> Void
+  ) {
     _fieldText = fieldText.unwrapped("")
     completion = onClear
   }
 
   public init(
     fieldText: Binding<String>,
-    onClear: (() -> Void)?) {
+    onClear: (() -> Void)?
+  ) {
     _fieldText = fieldText
     completion = onClear
   }
@@ -58,8 +66,10 @@ public struct TextFieldClearButton: ViewModifier {
   /// Adds the clear button to the view.
   /// - Parameter content: The content view (e.g., a `TextField`) to which the clear button will be added.
   /// - Returns: A view with the clear button added when the text is not empty.
-  @ViewBuilder public
-  func body(content: Content) -> some View {
+  @ViewBuilder
+  public
+    func body(content: Content) -> some View
+  {
     content
       .safeAreaInset(edge: .trailing) {
         Button {

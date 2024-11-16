@@ -36,20 +36,20 @@ public struct ListButtonStyle: ButtonStyle {
   }
 }
 
-public extension ButtonStyle where Self == ListButtonStyle {
+extension ButtonStyle where Self == ListButtonStyle {
   /// The standard list card button style.
-  static var list: ListButtonStyle { .init() }
+  public static var list: ListButtonStyle { .init() }
 
   /// A custom list card button style.
-  static func list(
+  public static func list(
     pressedOpacity: Double
   ) -> Self {
     .init(pressedOpacity: pressedOpacity)
   }
 }
 
-public extension ButtonStyle where Self == RefreshButtonStyle {
-  static var refresh: Self { .init() }
+extension ButtonStyle where Self == RefreshButtonStyle {
+  public static var refresh: Self { .init() }
 }
 
 // MARK: - RefreshButtonStyle
@@ -66,7 +66,7 @@ public struct RefreshButtonStyle: ButtonStyle {
 }
 
 @available(iOS 15.0, tvOS 15.0, watchOS 8.0, *)
-public extension Button {
+extension Button {
   // Creates a new button based on the specified `StandardType`.
   // This initializer allows you to configure the button with a title,
   // an icon, and an action to be performed when the button is tapped.
@@ -78,57 +78,61 @@ public extension Button {
   //   - bundle: An optional bundle for localized resources.
   //   - action: A closure that is executed when the button is pressed.
   #if canImport(UIKit)
-    init(
-      _ type: StandardType,
-      _ title: LocalizedStringKey? = nil,
-      _ icon: Image? = nil,
-      bundle: Bundle? = nil,
-      action: @escaping () -> Void) where Label == SwiftUI.Label<Text, Image?> {
-      self.init(role: type.role, action: action) {
-        Label(
-          title: { Text(title ?? type.title, bundle: bundle) },
-          icon: { icon ?? type.image })
-      }
+  init(
+    _ type: StandardType,
+    _ title: LocalizedStringKey? = nil,
+    _ icon: Image? = nil,
+    bundle: Bundle? = nil,
+    action: @escaping () -> Void
+  ) where Label == SwiftUI.Label<Text, Image?> {
+    self.init(role: type.role, action: action) {
+      Label(
+        title: { Text(title ?? type.title, bundle: bundle) },
+        icon: { icon ?? type.image }
+      )
     }
+  }
   #else
-    init(
-      _ type: StandardType,
-      _ title: LocalizedStringKey? = nil,
-      _ icon: Image? = nil,
-      bundle: Bundle? = nil,
-      action: @escaping () -> Void) where Label == SwiftUI.Label<Text, Image?> {
-      self.init(role: type.role, action: action) {
-        Label(
-          title: { Text(title ?? type.title, bundle: bundle) },
-          icon: { icon ?? type.image })
-      }
+  init(
+    _ type: StandardType,
+    _ title: LocalizedStringKey? = nil,
+    _ icon: Image? = nil,
+    bundle: Bundle? = nil,
+    action: @escaping () -> Void
+  ) where Label == SwiftUI.Label<Text, Image?> {
+    self.init(role: type.role, action: action) {
+      Label(
+        title: { Text(title ?? type.title, bundle: bundle) },
+        icon: { icon ?? type.image }
+      )
     }
+  }
   #endif
   /// This enum defines standard button types and provides
   /// standard localized texts and icons.
   @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
-  enum StandardType: String, CaseIterable, Identifiable {
+  public enum StandardType: String, CaseIterable, Identifiable {
     case add, addFavorite, addToFavorites,
-         cancel, call, copy,
-         delete, deselect, done,
-         edit, email,
-         ok,
-         paste,
-         removeFavorite, removeFromFavorites,
-         select, share
+      cancel, call, copy,
+      delete, deselect, done,
+      edit, email,
+      ok,
+      paste,
+      removeFavorite, removeFromFavorites,
+      select, share
   }
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
-public extension Button.StandardType {
-  var id: String { rawValue }
+extension Button.StandardType {
+  public var id: String { rawValue }
 
-  var image: Image? {
+  public var image: Image? {
     guard let imageName else { return nil }
     return Image(systemName: imageName)
   }
 
-  var imageName: String? {
+  public var imageName: String? {
     switch self {
     case .add: "plus"
     case .addFavorite: "star.circle"
@@ -150,7 +154,7 @@ public extension Button.StandardType {
     }
   }
 
-  var role: ButtonRole? {
+  public var role: ButtonRole? {
     switch self {
     case .cancel: .cancel
     case .delete: .destructive
@@ -158,7 +162,7 @@ public extension Button.StandardType {
     }
   }
 
-  var title: LocalizedStringKey {
+  public var title: LocalizedStringKey {
     switch self {
     case .add: "Button.Add"
     case .addFavorite: "Button.AddFavorite"
@@ -181,17 +185,19 @@ public extension Button.StandardType {
   }
 }
 
-public extension Button where Label == SwiftUI.Label<Text, Image> {
+extension Button where Label == SwiftUI.Label<Text, Image> {
   /// This initializer lets you use buttons with less code.
-  init(
+  public init(
     _ text: LocalizedStringKey,
     _ icon: Image,
     _ bundle: Bundle = .main,
-    action: @escaping () -> Void) {
+    action: @escaping () -> Void
+  ) {
     self.init(action: action) {
       Label(
         title: { Text(text, bundle: bundle) },
-        icon: { icon })
+        icon: { icon }
+      )
     }
   }
 }
@@ -210,10 +216,13 @@ public extension Button where Label == SwiftUI.Label<Text, Image> {
     buttons()
     buttons().labelStyle(.titleOnly)
     buttons().labelStyle(.iconOnly)
-  }.overlay(alignment: .top, content: { Button("Refresh Button", .init(sf: .arrowClockwise), action: {}).padding(33).buttonStyle(.refresh) })
-    .toolbar {
-      ToolbarItemGroup {
-        buttons()
-      }
+  }.overlay(
+    alignment: .top,
+    content: { Button("Refresh Button", .init(sf: .arrowClockwise), action: {}).padding(33).buttonStyle(.refresh) }
+  )
+  .toolbar {
+    ToolbarItemGroup {
+      buttons()
     }
+  }
 }

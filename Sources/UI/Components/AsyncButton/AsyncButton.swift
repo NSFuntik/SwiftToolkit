@@ -28,7 +28,8 @@ public struct AsyncButton<Label: View, Trigger: Equatable>: View {
   init(
     cancellation: Trigger = false,
     action: @escaping () async -> Void,
-    @ViewBuilder label: () -> Label) {
+    @ViewBuilder label: () -> Label
+  ) {
     self.cancellation = cancellation
     self.action = action
     self.label = label()
@@ -43,7 +44,8 @@ public struct AsyncButton<Label: View, Trigger: Equatable>: View {
   init(
     cancellation: Trigger = false,
     action: Void,
-    @ViewBuilder label: () -> Label) {
+    @ViewBuilder label: () -> Label
+  ) {
     self.cancellation = cancellation
     self.action = { action }
     self.label = label()
@@ -65,7 +67,9 @@ public struct AsyncButton<Label: View, Trigger: Equatable>: View {
     .disabled(isRunning)
     .opacity(isRunning ? 0.5 : 1)
     .shimmering(active: isRunning)
-    .if(isRunning) { $0.overlay(alignment: .center, content: { ProgressView().progressViewStyle(.circular).padding() }) }
+    .if(isRunning) {
+      $0.overlay(alignment: .center, content: { ProgressView().progressViewStyle(.circular).padding() })
+    }
     .onChange(of: cancellation) { _ in
       task?.cancel()
     }
@@ -75,15 +79,16 @@ public struct AsyncButton<Label: View, Trigger: Equatable>: View {
 /// A specialized extension for `AsyncButton` where the Trigger type is `Never`.
 ///
 /// This extension provides a more simplified initializer for cases where no cancellation is required.
-public extension AsyncButton where Trigger == Never {
+extension AsyncButton where Trigger == Never {
   /// Creates the async button without a cancellation trigger.
   ///
   /// - Parameters:
   ///   - action: The asynchronous action to perform when the button is pressed.
   ///   - label: A view builder that constructs the label for the button.
-  init(
+  public init(
     action: @escaping () async -> Void,
-    @ViewBuilder label: () -> Label) {
+    @ViewBuilder label: () -> Label
+  ) {
     self.action = action
     self.label = label()
   }

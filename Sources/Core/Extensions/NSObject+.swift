@@ -1,3 +1,7 @@
+import AdSupport
+import AppTrackingTransparency
+import Foundation
+
 //
 //  File.swift
 //
@@ -5,13 +9,10 @@
 //  Created by Dmitry Mikhaylov on 27.02.2024.
 //
 #if canImport(UIKit)
-  import UIKit
+import UIKit
 #elseif canImport(AppKit)
-  import AppKit
+import AppKit
 #endif
-import AdSupport
-import Foundation
-import AppTrackingTransparency
 
 /// Executes a given action on the main actor asynchronously.
 ///
@@ -64,12 +65,12 @@ public func unwrapOrThrow<T>(_ optional: T?, _ error: Error) throws -> T {
   }
 }
 
-public extension Bool {
+extension Bool {
   /// Throws an error if the boolean value is `false`.
   ///
   /// - Parameter error: The error to throw if the boolean value is `false`.
   /// - Throws: The provided error if the boolean value is `false`.
-  func trueOrThrow(_ error: Error) throws {
+  public func trueOrThrow(_ error: Error) throws {
     if !self {
       throw error
     }
@@ -97,11 +98,11 @@ extension Optional: Equatable where Wrapped: Equatable {
   }
 }
 
-public extension Optional {
+extension Optional {
   /// Whether or not the value is `nil`.
-  var isNil: Bool { return self != nil ? false : true }
+  public var isNil: Bool { return self != nil ? false : true }
   /// Whether or not the value is set and not `nil`.
-  var isSet: Bool { !isNil }
+  public var isSet: Bool { !isNil }
 }
 
 // MARK: - TypeWrapper
@@ -144,7 +145,8 @@ public struct File {
     name: String,
     url: URL,
     modificationDate: Date?,
-    size: UInt64?) {
+    size: UInt64?
+  ) {
     self.name = name
     self.url = url
     self.modificationDate = modificationDate
@@ -152,12 +154,12 @@ public struct File {
   }
 }
 
-public extension File {
+extension File {
   /// Initializes a new `File` instance from a URL.
   ///
   /// This initializer retrieves the file attributes from the given URL. If the attributes cannot be accessed, it returns `nil`.
   /// - Parameter url: The URL of the file.
-  init?(url: URL) {
+  public init?(url: URL) {
     guard let attributes = try? FileManager.default.attributesOfItem(atPath: url.path) else {
       return nil
     }
@@ -169,138 +171,141 @@ public extension File {
 }
 
 #if canImport(UIKit)
-  public extension UIView {
-    /// Finds the closest view controller that the view is part of.
-    ///
-    /// This method traverses the responder chain looking for a `UIViewController`.
-    /// - Returns: The closest `UIViewController` that contains this view, if found; otherwise, `nil`.
-    func closestVC() -> UIViewController? {
-      var responder: UIResponder? = self
-      while responder != nil {
-        if let vc = responder as? UIViewController {
-          return vc
-        }
-        responder = responder?.next
-      }
-      return nil
-    }
-  }
-
-  public extension CGFloat {
-    /// A computed property that returns the screen width.
-    ///
-    /// - Returns: The width of the main screen.
-    @inline(__always)
-    static var screenWidth: CGFloat {
-      UIScreen.mainScreen.bounds.width
-    }
-
-    /// A computed property that returns the screen height.
-    ///
-    /// - Returns: The height of the main screen.
-    @inline(__always)
-    static var screenHeight: CGFloat {
-      UIScreen.mainScreen.bounds.height
-    }
-  }
-
-  /// An extension to remove specific keys and corresponding values from a dictionary.
+extension UIView {
+  /// Finds the closest view controller that the view is part of.
   ///
-  /// - Parameters:
-  ///   - keys: An array of keys to be removed from the dictionary.
-  /// - Returns: A new dictionary with the specified keys and their values removed.
-  public extension Dictionary {
-    func removingValues(forKeys keys: [Key]) -> [Key: Value]? {
-      var result = self
-      for key in keys {
-        result.removeValue(forKey: key)
+  /// This method traverses the responder chain looking for a `UIViewController`.
+  /// - Returns: The closest `UIViewController` that contains this view, if found; otherwise, `nil`.
+  public func closestVC() -> UIViewController? {
+    var responder: UIResponder? = self
+    while responder != nil {
+      if let vc = responder as? UIViewController {
+        return vc
       }
-      return result
+      responder = responder?.next
     }
+    return nil
+  }
+}
+
+extension CGFloat {
+  /// A computed property that returns the screen width.
+  ///
+  /// - Returns: The width of the main screen.
+  @inline(__always)
+  public static var screenWidth: CGFloat {
+    UIScreen.mainScreen.bounds.width
   }
 
-  public extension UIApplication {
-    /// A computed property that provides the key window of the application.
-    ///
-    /// - Returns: The active key window if available; otherwise, `nil`.
-    var keyWindow: UIWindow? {
-      UIApplication.shared.connectedScenes
-        .filter { $0.activationState == .foregroundActive }
-        .first(where: { $0 is UIWindowScene })
-        .flatMap { $0 as? UIWindowScene }?.windows
-        .first(where: \.isKeyWindow)
+  /// A computed property that returns the screen height.
+  ///
+  /// - Returns: The height of the main screen.
+  @inline(__always)
+  public static var screenHeight: CGFloat {
+    UIScreen.mainScreen.bounds.height
+  }
+}
+
+/// An extension to remove specific keys and corresponding values from a dictionary.
+///
+/// - Parameters:
+///   - keys: An array of keys to be removed from the dictionary.
+/// - Returns: A new dictionary with the specified keys and their values removed.
+extension Dictionary {
+  public func removingValues(forKeys keys: [Key]) -> [Key: Value]? {
+    var result = self
+    for key in keys {
+      result.removeValue(forKey: key)
     }
+    return result
+  }
+}
+
+extension UIApplication {
+  /// A computed property that provides the key window of the application.
+  ///
+  /// - Returns: The active key window if available; otherwise, `nil`.
+  public var keyWindow: UIWindow? {
+    UIApplication.shared.connectedScenes
+      .filter { $0.activationState == .foregroundActive }
+      .first(where: { $0 is UIWindowScene })
+      .flatMap { $0 as? UIWindowScene }?.windows
+      .first(where: \.isKeyWindow)
+  }
+}
+
+extension UIApplication {
+  /// Ends editing for the application by resigning the first responder.
+  ///
+  /// - Parameter action: An optional closure to be executed after resigning first responder.
+  public func endEditing(action: () -> Void = {}) {
+    sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    action()
   }
 
-  public extension UIApplication {
-    /// Ends editing for the application by resigning the first responder.
-    ///
-    /// - Parameter action: An optional closure to be executed after resigning first responder.
-    func endEditing(action: () -> Void = {}) {
-      sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-      action()
-    }
+  /// A computed property that retrieves the active scene for the application.
+  ///
+  /// - Returns: The active `UIWindowScene` if available; otherwise, `nil`.
+  public class var activeScene: UIWindowScene? {
+    UIApplication.shared.connectedScenes
+      .filter { $0.activationState == .foregroundActive }
+      .first
+      as? UIWindowScene
+  }
+}
 
-    /// A computed property that retrieves the active scene for the application.
-    ///
-    /// - Returns: The active `UIWindowScene` if available; otherwise, `nil`.
-    class var activeScene: UIWindowScene? {
-      UIApplication.shared.connectedScenes
-        .filter { $0.activationState == .foregroundActive }
-        .first
-        as? UIWindowScene
-    }
+public class Utils {
+  /// Creates a `UIImage` from the provided data.
+  ///
+  /// - Parameter data: The data representing the image.
+  /// - Returns: A `UIImage` created from the data, or `nil` if the data is invalid.
+  public static func image(data: Data) -> UIImage? {
+    UIImage(data: data)
   }
 
-  public class Utils {
-    /// Creates a `UIImage` from the provided data.
-    ///
-    /// - Parameter data: The data representing the image.
-    /// - Returns: A `UIImage` created from the data, or `nil` if the data is invalid.
-    public static func image(data: Data) -> UIImage? {
-      UIImage(data: data)
-    }
+  /// Converts a `UIImage` into `Data`.
+  ///
+  /// - Parameter image: The `UIImage` to be converted.
+  /// - Returns: The data representation of the image, or `nil` if the conversion fails.
+  public static func data(image: UIImage) -> Data? {
+    #if canImport(UIKit)
+    return image.jpegData(compressionQuality: 0.9)
+    #elseif canImport(AppKit)
+    return image.tiffRepresentation
+    #else
+    return nil
+    #endif
+  }
+}
 
-    /// Converts a `UIImage` into `Data`.
-    ///
-    /// - Parameter image: The `UIImage` to be converted.
-    /// - Returns: The data representation of the image, or `nil` if the conversion fails.
-    public static func data(image: UIImage) -> Data? {
-      #if canImport(UIKit)
-        return image.jpegData(compressionQuality: 0.9)
-      #elseif canImport(AppKit)
-        return image.tiffRepresentation
-      #else
-        return nil
-      #endif
+extension UIScreen {
+  /// A computed property that returns the main screen.
+  ///
+  /// - Returns: The main screen instance.
+  @nonobjc
+  public static var mainScreen: UIScreen { .main }
+  /// A computed property that returns the current orientation of the device.
+  ///
+  /// - Returns: The orientation of the device.
+  @nonobjc
+  public static var orientation: UIDeviceOrientation {
+    let point = UIScreen.mainScreen.coordinateSpace.convert(
+      CGPoint.zero,
+      to: UIScreen.mainScreen.fixedCoordinateSpace
+    )
+    if point == CGPoint.zero {
+      return .portrait
+    } else if point.x != 0, point.y != 0 {
+      return .portraitUpsideDown
+    } else if point.x == 0, point.y != 0 {
+      return .landscapeRight  // .landscapeLeft
+    } else if point.x != 0, point.y == 0 {
+      return .landscapeLeft  // .landscapeRight
+    } else {
+      return .unknown
     }
   }
-
-  public extension UIScreen {
-    /// A computed property that returns the main screen.
-    ///
-    /// - Returns: The main screen instance.
-    @nonobjc
-    static var mainScreen: UIScreen { .main }
-    /// A computed property that returns the current orientation of the device.
-    ///
-    /// - Returns: The orientation of the device.
-    @nonobjc
-    static var orientation: UIDeviceOrientation {
-      let point = UIScreen.mainScreen.coordinateSpace.convert(CGPoint.zero, to: UIScreen.mainScreen.fixedCoordinateSpace)
-      if point == CGPoint.zero {
-        return .portrait
-      } else if point.x != 0, point.y != 0 {
-        return .portraitUpsideDown
-      } else if point.x == 0, point.y != 0 {
-        return .landscapeRight // .landscapeLeft
-      } else if point.x != 0, point.y == 0 {
-        return .landscapeLeft // .landscapeRight
-      } else {
-        return .unknown
-      }
-    }
-  }
+}
 #endif
 /// Maps the keys of a dictionary using a transformation closure.
 ///

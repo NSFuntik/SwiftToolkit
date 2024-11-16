@@ -1,6 +1,6 @@
-import os.log
 import Combine
 import SwiftUI
+import os.log
 
 // MARK: - SwiftUILogger
 
@@ -40,28 +40,30 @@ open class SwiftUILogger: ObservableObject, TextOutputStream {
     }
 
     public var emoji: Image {
-      let systemName = switch self {
-      case .success: "party.popper.fill"
-      case .info: "stethoscope"
-      case .warning: "drop.triangle.fill"
-      case .error: "delete.right.fill"
-      case .fatal: "light.beacon.max.fill"
-      case .debug: "apple.terminal.on.rectangle"
-      case .trace: "calendar.day.timeline.left"
-      }
+      let systemName =
+        switch self {
+        case .success: "party.popper.fill"
+        case .info: "stethoscope"
+        case .warning: "drop.triangle.fill"
+        case .error: "delete.right.fill"
+        case .fatal: "light.beacon.max.fill"
+        case .debug: "apple.terminal.on.rectangle"
+        case .trace: "calendar.day.timeline.left"
+        }
       return Image(systemName: systemName).symbolRenderingMode(.multicolor)
     }
 
     public var symbol: String {
-      let systemName = switch self {
-      case .success: "􁓵"
-      case .info: "􀝾"
-      case .warning: "􀈀"
-      case .error: "􀆗"
-      case .fatal: "􁒱"
-      case .debug: "􁹛"
-      case .trace: "􀻤"
-      }
+      let systemName =
+        switch self {
+        case .success: "􁓵"
+        case .info: "􀝾"
+        case .warning: "􀈀"
+        case .error: "􀆗"
+        case .fatal: "􁒱"
+        case .debug: "􁹛"
+        case .trace: "􀻤"
+        }
       return systemName
     }
 
@@ -88,7 +90,8 @@ open class SwiftUILogger: ObservableObject, TextOutputStream {
       public init(
         file: StaticString,
         line: Int,
-        tags: [any LogTagging]) {
+        tags: [any LogTagging]
+      ) {
         self.file = file
         self.line = line
         self.tags = tags
@@ -138,7 +141,8 @@ open class SwiftUILogger: ObservableObject, TextOutputStream {
       error: Error? = nil,
       tags: [any LogTagging] = [],
       _ file: StaticString = #fileID,
-      _ line: Int = #line) {
+      _ line: Int = #line
+    ) {
       self.id = UUID()
       self.dateCreated = Date()
       self.level = level
@@ -147,7 +151,8 @@ open class SwiftUILogger: ObservableObject, TextOutputStream {
       self.metadata = .init(
         file: file,
         line: line,
-        tags: tags)
+        tags: tags
+      )
     }
   }
 
@@ -180,12 +185,14 @@ open class SwiftUILogger: ObservableObject, TextOutputStream {
     lock.lock()
     defer { lock.unlock() }
 
-    return displayedLogs
+    return
+      displayedLogs
       .map { event -> String in
         let date = Event.dateFormatter.string(from: event.dateCreated)
         let time = Event.timeFormatter.string(from: event.dateCreated)
         let emoji = event.level.emoji
-        let eventMessage = "\(date) \(time) \(emoji): \(event.message) (File: \(event.metadata.file)@\(event.metadata.line))"
+        let eventMessage =
+          "\(date) \(time) \(emoji): \(event.message) (File: \(event.metadata.file)@\(event.metadata.line))"
 
         guard let error = event.error else {
           return eventMessage
@@ -199,7 +206,8 @@ open class SwiftUILogger: ObservableObject, TextOutputStream {
   ///
   public init(
     name: String? = nil,
-    logs: [Event] = []) {
+    logs: [Event] = []
+  ) {
     self.lock = NSLock()
     self.name = name
     self.logs = logs
@@ -215,7 +223,8 @@ open class SwiftUILogger: ObservableObject, TextOutputStream {
     _ error: Error? = nil,
     _ tags: [any LogTagging] = [],
     _ file: StaticString = #fileID,
-    _ line: Int = #line) {
+    _ line: Int = #line
+  ) {
     guard Thread.isMainThread else {
       return DispatchQueue.main.async { [weak self] in
         self?.log(level, message, error, tags, file, line)
@@ -243,7 +252,8 @@ open class SwiftUILogger: ObservableObject, TextOutputStream {
           error: error,
           tags: tags,
           file,
-          line)
+          line
+        )
       )
     }
   }
@@ -253,14 +263,16 @@ open class SwiftUILogger: ObservableObject, TextOutputStream {
     _ message: String,
     _ tags: [any LogTagging] = [],
     _ file: StaticString = #fileID,
-    _ line: Int = #line) {
+    _ line: Int = #line
+  ) {
     log(
       .trace,
       message,
       nil,
       tags,
       file,
-      line)
+      line
+    )
   }
 
   ///
@@ -268,28 +280,32 @@ open class SwiftUILogger: ObservableObject, TextOutputStream {
     _ message: String,
     _ tags: [any LogTagging] = [],
     _ file: StaticString = #fileID,
-    _ line: Int = #line) {
+    _ line: Int = #line
+  ) {
     log(
       .success,
       message,
       nil,
       tags,
       file,
-      line)
+      line
+    )
   }
 
   @inlinable open func debug(
     _ message: String,
     _ tags: [any LogTagging] = [],
     _ file: StaticString = #fileID,
-    _ line: Int = #line) {
+    _ line: Int = #line
+  ) {
     log(
       .info,
       message,
       nil,
       tags,
       file,
-      line)
+      line
+    )
   }
 
   ///
@@ -297,14 +313,16 @@ open class SwiftUILogger: ObservableObject, TextOutputStream {
     _ message: String,
     _ tags: [any LogTagging] = [],
     _ file: StaticString = #fileID,
-    _ line: Int = #line) {
+    _ line: Int = #line
+  ) {
     log(
       .info,
       message,
       nil,
       tags,
       file,
-      line)
+      line
+    )
   }
 
   ///
@@ -312,28 +330,32 @@ open class SwiftUILogger: ObservableObject, TextOutputStream {
     _ message: String,
     _ tags: [any LogTagging] = [],
     _ file: StaticString = #fileID,
-    _ line: Int = #line) {
+    _ line: Int = #line
+  ) {
     log(
       .warning,
       message,
       nil,
       tags,
       file,
-      line)
+      line
+    )
   }
 
   @inlinable open func fault(
     _ message: String,
     _ tags: [any LogTagging] = [],
     _ file: StaticString = #fileID,
-    _ line: Int = #line) {
+    _ line: Int = #line
+  ) {
     log(
       .warning,
       message,
       nil,
       tags,
       file,
-      line)
+      line
+    )
   }
 
   ///
@@ -342,28 +364,32 @@ open class SwiftUILogger: ObservableObject, TextOutputStream {
     error: Error?,
     _ tags: [any LogTagging] = [],
     _ file: StaticString = #fileID,
-    _ line: Int = #line) {
+    _ line: Int = #line
+  ) {
     log(
       .error,
       message,
       error,
       tags,
       file,
-      line)
+      line
+    )
   }
 
   @inlinable open func error(
     _ message: String,
     _ error: Error? = nil,
     _ file: StaticString = #fileID,
-    _ line: Int = #line) {
+    _ line: Int = #line
+  ) {
     log(
       .error,
       message,
       error,
       [],
       file,
-      line)
+      line
+    )
   }
 
   ///
@@ -372,17 +398,19 @@ open class SwiftUILogger: ObservableObject, TextOutputStream {
     error: Error?,
     _ tags: [any LogTagging] = [],
     _ file: StaticString = #fileID,
-    _ line: Int = #line) {
+    _ line: Int = #line
+  ) {
     log(
       .fatal,
       message,
       error,
       tags,
       file,
-      line)
+      line
+    )
   }
 }
 
-public extension Logger {
-  static var shared = Logger()
+extension Logger {
+  public static var shared = Logger()
 }

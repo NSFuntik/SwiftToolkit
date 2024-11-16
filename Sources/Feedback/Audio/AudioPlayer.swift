@@ -24,10 +24,10 @@ public final class AudioPlayer: NSObject, Observable, AVAudioPlayerDelegate {
   @MainActor
   public func play(audio: Audio) async throws {
     #if os(iOS)
-      await stop()
+    await stop()
 
-      try AVAudioSession.sharedInstance().setCategory(.ambient)
-      try AVAudioSession.sharedInstance().setActive(true)
+    try AVAudioSession.sharedInstance().setCategory(.ambient)
+    try AVAudioSession.sharedInstance().setActive(true)
     #endif
     try await MainActor.run {
       player = try AVAudioPlayer(contentsOf: audio.url)

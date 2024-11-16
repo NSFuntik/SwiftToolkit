@@ -9,21 +9,16 @@ import SwiftUI
 
 // MARK: - ViewSizeKey
 
-import SwiftUI
-
-// MARK: - ViewSizeKey
-
-/// A preference key that holds a size value. This can be used to track the size of views in a SwiftUI hierarchy.
 struct ViewSizeKey: PreferenceKey {
-  static var defaultValue: CGSize? = nil
+  static var defaultValue: CGSize?
   static func reduce(value: inout CGSize?, nextValue: () -> CGSize?) { value = nextValue() }
 }
 
-public extension View {
+extension View {
   /// A view modifier that allows views to report their size to a binding.
   /// - Parameter size: A binding to a CGSize that will be updated with the size of the view.
   /// - Returns: A modified view that will report its size.
-  func viewSize(_ size: Binding<CGSize>) -> some View {
+  public func viewSize(_ size: Binding<CGSize>) -> some View {
     modifier(SizeCalculator(size: size))
   }
 }

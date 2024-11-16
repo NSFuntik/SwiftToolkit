@@ -4,11 +4,11 @@
 //
 //  Provides a comprehensive CoreData and CloudKit integration layer
 
-import os.log
+import CloudKit
 import Combine
 import CoreData
-import CloudKit
 import Foundation
+import os.log
 
 /// A robust database management actor providing async/await CoreData operations
 public actor Database: NSObject, Sendable {
@@ -58,7 +58,8 @@ public actor Database: NSObject, Sendable {
   ///   - modelBundle: Bundle containing the Core Data model
   public init(
     storeDescriptions: [NSPersistentStoreDescription] = [.localData()],
-    modelBundle: Bundle = Bundle.main) {
+    modelBundle: Bundle = Bundle.main
+  ) {
     let model = NSManagedObjectModel.mergedModel(from: [modelBundle])!
     container = NSPersistentCloudKitContainer(name: "Database", managedObjectModel: model)
 
@@ -116,7 +117,8 @@ public actor Database: NSObject, Sendable {
           log: .default,
           type: .error,
           error.localizedDescription,
-          description.configuration ?? "Unknown")
+          description.configuration ?? "Unknown"
+        )
 
         // Handle migration failures
         if (error as NSError).code == 134_110 {
@@ -128,7 +130,8 @@ public actor Database: NSObject, Sendable {
           "Store added successfully: %@",
           log: .default,
           type: .info,
-          description.url?.path ?? "Unknown path")
+          description.url?.path ?? "Unknown path"
+        )
       }
     }
   }
@@ -165,7 +168,8 @@ public actor Database: NSObject, Sendable {
     if let data = UserDefaults.standard.data(forKey: "HistoryToken" + storeUUID) {
       return try? NSKeyedUnarchiver.unarchivedObject(
         ofClass: NSPersistentHistoryToken.self,
-        from: data)
+        from: data
+      )
     }
     return nil
   }
@@ -176,10 +180,12 @@ public actor Database: NSObject, Sendable {
   ///   - newToken: New history token to store
   private nonisolated func updateHistoryToken(
     with storeUUID: String,
-    newToken: NSPersistentHistoryToken) {
+    newToken: NSPersistentHistoryToken
+  ) {
     let data = try? NSKeyedArchiver.archivedData(
       withRootObject: newToken,
-      requiringSecureCoding: true)
+      requiringSecureCoding: true
+    )
     UserDefaults.standard.set(data, forKey: "HistoryToken" + storeUUID)
   }
 
@@ -205,14 +211,15 @@ public actor Database: NSObject, Sendable {
   /// - Parameter notification: Notification about remote store changes
   private nonisolated func didRemoteChange(notification: Notification) {
     guard let storeUUID = notification.userInfo?[NSStoreUUIDKey] as? String,
-          let privateStore = privateStore,
-          let sharedStore = sharedStore,
-          privateStore.identifier == storeUUID ||
-          sharedStore.identifier == storeUUID else {
+      let privateStore = privateStore,
+      let sharedStore = sharedStore,
+      privateStore.identifier == storeUUID || sharedStore.identifier == storeUUID
+    else {
       os_log(
         "Ignoring store remote change notification due to invalid store UUID",
         log: .default,
-        type: .debug)
+        type: .debug
+      )
       return
     }
 
@@ -227,8 +234,9 @@ public actor Database: NSObject, Sendable {
     try await fetch { ctx in
       try self.historyQueue.sync { [weak self] in
         guard let self = self,
-              let privateStore = self.privateStore,
-              let sharedStore = self.sharedStore else {
+          let privateStore = self.privateStore,
+          let sharedStore = self.sharedStore
+        else {
           return
         }
         let lastHistoryToken: NSPersistentHistoryToken? = self.historyToken(with: storeUUID)
@@ -236,17 +244,17 @@ public actor Database: NSObject, Sendable {
         request.fetchRequest = NSPersistentHistoryTransaction.fetchRequest
 
         request.affectedStores = [
-          privateStore.identifier == storeUUID ? privateStore :
-            sharedStore.identifier == storeUUID ? sharedStore : nil,
+          privateStore.identifier == storeUUID ? privateStore : sharedStore.identifier == storeUUID ? sharedStore : nil
         ].compactMap { $0 }
 
         guard let result = try ctx.execute(request) as? NSPersistentHistoryResult,
-              let transactions = result.result as? [NSPersistentHistoryTransaction] else {
+          let transactions = result.result as? [NSPersistentHistoryTransaction]
+        else {
           return
         }
 
         // Handle share changes or process transactions
-        if transactions.isEmpty { // when transaction is empty it looks like CKShare is changed
+        if transactions.isEmpty {  // when transaction is empty it looks like CKShare is changed
           Task { @MainActor in
             self.sharePublisher.send()
           }
@@ -266,7 +274,8 @@ public actor Database: NSObject, Sendable {
   ///   - storeUUID: Unique identifier for the store
   private func processHistoryTransactions(
     _ transactions: [NSPersistentHistoryTransaction],
-    storeUUID: String) throws {
+    storeUUID: String
+  ) throws {
     // Update history token
     if let newToken: NSPersistentHistoryToken = transactions.last?.token {
       updateHistoryToken(with: storeUUID, newToken: newToken)
@@ -284,23 +293,26 @@ public actor Database: NSObject, Sendable {
         classes: &classes,
         inserted: &inserted,
         updated: &updated,
-        deleted: &deleted)
+        deleted: &deleted
+      )
     }
 
     // Notify about changes
     if !classes.isEmpty {
-      Task { @MainActor [
-        classes,
-        inserted,
-        updated,
-        deleted
-      ] in
+      Task {
+        @MainActor [
+          classes,
+          inserted,
+          updated,
+          deleted
+        ] in
         objectsDidChange.send(
           Change(
             classes: classes,
             inserted: inserted,
             updated: updated,
-            deleted: deleted)
+            deleted: deleted
+          )
         )
       }
     }
@@ -318,7 +330,8 @@ public actor Database: NSObject, Sendable {
     classes: inout Set<String>,
     inserted: inout Set<NSManagedObjectID>,
     updated: inout Set<NSManagedObjectID>,
-    deleted: inout Set<NSManagedObjectID>) {
+    deleted: inout Set<NSManagedObjectID>
+  ) {
     var others = Set<NSPersistentHistoryChange>()
 
     transaction.changes?.forEach { change in
@@ -334,7 +347,8 @@ public actor Database: NSObject, Sendable {
 
     others.forEach { change in
       guard !deleted.contains(change.changedObjectID),
-            let className = change.changedObjectID.entity.name else { return }
+        let className = change.changedObjectID.entity.name
+      else { return }
 
       classes.insert(className)
 
@@ -352,21 +366,24 @@ public actor Database: NSObject, Sendable {
   /// Processes local changes after merge
   private nonisolated func didMerge(_ notification: Notification) async {
     if let context: NSManagedObjectContext = notification.object as? NSManagedObjectContext,
-       await context == viewContext,
-       let userInfo: [AnyHashable: Any] = notification.userInfo {
+      await context == viewContext,
+      let userInfo: [AnyHashable: Any] = notification.userInfo
+    {
       var classes = Set<String>()
 
       let extract: (String) -> Set<NSManagedObjectID> = { key in
         let set: Set<NSManagedObjectID> = userInfo[key] as? Set<NSManagedObjectID> ?? Set()
 
-        return Set(set.compactMap { objectId in
-          guard let className = objectId.entity.name else { return nil }
+        return Set(
+          set.compactMap { objectId in
+            guard let className = objectId.entity.name else { return nil }
 
-          if className.hasPrefix("NSCK") { return nil } // skip system items
+            if className.hasPrefix("NSCK") { return nil }  // skip system items
 
-          classes.insert(className)
-          return objectId
-        })
+            classes.insert(className)
+            return objectId
+          }
+        )
       }
 
       let inserted: Set<NSManagedObjectID> = extract("inserted_objectIDs")
@@ -375,10 +392,14 @@ public actor Database: NSObject, Sendable {
 
       if classes.count > 0 {
         Task { @MainActor [classes] in
-          objectsDidChange.send(Change(classes: classes,
-                                       inserted: inserted,
-                                       updated: updated,
-                                       deleted: deleted))
+          objectsDidChange.send(
+            Change(
+              classes: classes,
+              inserted: inserted,
+              updated: updated,
+              deleted: deleted
+            )
+          )
         }
       }
     }

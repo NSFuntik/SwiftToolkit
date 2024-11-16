@@ -7,53 +7,53 @@
 
 import SwiftUI
 
-public extension View {
-	dynamic func dismissKeyboardGestures() -> some View {
-		ModifiedContent(content: self, modifier: DismissKeyboardOnTappingOutside())
-	}
+extension View {
+  public dynamic func dismissKeyboardGestures() -> some View {
+    ModifiedContent(content: self, modifier: DismissKeyboardOnTappingOutside())
+  }
 }
 
 // MARK: - DismissKeyboardOnTappingOutside
 
 @frozen public struct DismissKeyboardOnTappingOutside: ViewModifier {
-	// Computed Properties
+  // Computed Properties
 
-	private var swipeGesture: some Gesture {
-		DragGesture(minimumDistance: 10, coordinateSpace: .global)
-			.onChanged(self.endEditing)
-	}
+  private var swipeGesture: some Gesture {
+    DragGesture(minimumDistance: 10, coordinateSpace: .global)
+      .onChanged(self.endEditing)
+  }
 
-	// Content
+  // Content
 
-	public func body(content: Content) -> some View {
-		content
+  public func body(content: Content) -> some View {
+    content
       .allowsHitTesting(true)
-			.onTapGesture {
-				#if os(iOS)
-					UIApplication.shared.endEditing()
-				#endif
-			}
-			.gesture(self.swipeGesture)
-	}
+      .onTapGesture {
+        #if os(iOS)
+        UIApplication.shared.endEditing()
+        #endif
+      }
+      .gesture(self.swipeGesture)
+  }
 
-	// Functions
+  // Functions
 
-	private func endEditing(_: DragGesture.Value) {
-		#if os(iOS)
-			UIApplication.shared.endEditing()
-		#endif
-	}
+  private func endEditing(_: DragGesture.Value) {
+    #if os(iOS)
+    UIApplication.shared.endEditing()
+    #endif
+  }
 }
 
 #if DEBUG
-	struct DismissKeyboardOnTappingOutside_Previews: PreviewProvider {
-		static var previews: some View {
-			VStack {
-				Spacer()
-				FloatingTextField(placeholderText: "Preveiw", placeholderOffset: .nan, scaleEffectValue: .zero) { _, _ in
-				}
-				Spacer()
-			}.dismissKeyboardGestures()
-		}
-	}
+struct DismissKeyboardOnTappingOutside_Previews: PreviewProvider {
+  static var previews: some View {
+    VStack {
+      Spacer()
+      FloatingTextField(placeholderText: "Preveiw", placeholderOffset: .nan, scaleEffectValue: .zero) { _, _ in
+      }
+      Spacer()
+    }.dismissKeyboardGestures()
+  }
+}
 #endif

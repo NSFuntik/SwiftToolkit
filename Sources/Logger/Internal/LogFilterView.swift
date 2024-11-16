@@ -1,5 +1,5 @@
-import SwiftUI
 import Combine
+import SwiftUI
 
 public struct LogFilterView: View {
   // Properties
@@ -19,7 +19,8 @@ public struct LogFilterView: View {
   public init(
     logger: SwiftUILogger = .default,
     tags: [String],
-    isPresented: Binding<Bool>) {
+    isPresented: Binding<Bool>
+  ) {
     self.logger = logger
     self.tags = tags
     self.isPresented = isPresented
@@ -75,10 +76,11 @@ public struct LogFilterView: View {
   private var searchBar: some View {
     SearchBar(
       searchText: self.$searchText,
-      placeholder: "Search for tags")
-      .onReceive(Just(self.searchText)) { keyword in
-        self.displayedTags = self.onSearchKeyword(keyword)
-      }
+      placeholder: "Search for tags"
+    )
+    .onReceive(Just(self.searchText)) { keyword in
+      self.displayedTags = self.onSearchKeyword(keyword)
+    }
   }
 
   private var tagListView: some View {
@@ -86,17 +88,19 @@ public struct LogFilterView: View {
       GeometryReader { _ in
         LazyVGrid(
           columns: [GridItem(.flexible())],
-          spacing: 8) {
-            Group {
-              ForEach(self.displayedTags, id: \.self) { tagName in
-                LogTagView(
-                  name: tagName,
-                  selectedTags: self.$selectedTags)
-              }
+          spacing: 8
+        ) {
+          Group {
+            ForEach(self.displayedTags, id: \.self) { tagName in
+              LogTagView(
+                name: tagName,
+                selectedTags: self.$selectedTags
+              )
             }
-            .navigationTitle("Filter")
           }
-          .background(Color.clear)
+          .navigationTitle("Filter")
+        }
+        .background(Color.clear)
       }
       .padding(.horizontal, 16)
     }
@@ -131,7 +135,8 @@ public struct LogFilterView: View {
         .lowercased()
         .range(
           of: keyword.lowercased(),
-          options: .caseInsensitive) != nil
+          options: .caseInsensitive
+        ) != nil
     }
 
     return filtered.isEmpty ? self.tags : filtered

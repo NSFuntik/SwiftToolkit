@@ -19,7 +19,13 @@ public struct SplitConstraints {
   /// Whether to hide the secondary side when dragging stops past minSFraction
   var dragToHideS: Bool
 
-  public init(minPFraction: CGFloat? = nil, minSFraction: CGFloat? = nil, priority: SplitSide? = nil, dragToHideP: Bool = false, dragToHideS: Bool = false) {
+  public init(
+    minPFraction: CGFloat? = nil,
+    minSFraction: CGFloat? = nil,
+    priority: SplitSide? = nil,
+    dragToHideP: Bool = false,
+    dragToHideS: Bool = false
+  ) {
     self.minPFraction = minPFraction
     self.minSFraction = minSFraction
     self.priority = priority

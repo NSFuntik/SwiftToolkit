@@ -7,11 +7,11 @@
 import Core
 import Foundation
 
-public extension Dictionary where Value == Any? {
+extension Dictionary where Value == Any? {
   /// Returns a new dictionary without nil and empty values.
   ///
   /// - Returns: A new dictionary with non-empty and non-nil values.
-  func removingEmptyValues() -> [Key: Any] {
+  public func removingEmptyValues() -> [Key: Any] {
     self.removingNilValues().compactMapValues {
       if let value = $0 as? [Any] {
         guard !value.isEmpty else {
@@ -29,16 +29,16 @@ public extension Dictionary where Value == Any? {
   }
 }
 
-public extension Dictionary where Value == Value {
+extension Dictionary where Value == Value {
   /// An array of key-value pairs represented as tuples of strings.
-  var keyValuePairs: [(key: String, value: String)] {
+  public var keyValuePairs: [(key: String, value: String)] {
     jsonElements.compactMap { ("\($0.key)", "\(String(describing: $0.value))") }
   }
 
   /// Returns a new dictionary without empty values.
   ///
   /// - Returns: A new dictionary with only non-empty values.
-  func removingEmptyValues() -> [Key: Any] {
+  public func removingEmptyValues() -> [Key: Any] {
     compactMapValues {
       if let value = $0 as? [Any] {
         guard !value.isEmpty else {
@@ -58,21 +58,21 @@ public extension Dictionary where Value == Value {
   /// Returns a formatted string representing the dictionary.
   ///
   /// - Returns: A string constructed from non-empty key-value pairs.
-  func print() -> String {
+  public func print() -> String {
     self.removingEmptyValues()
       .compactMap { " ▶︎ \($0.key) –▷ \($0.value)" }.joined(separator: "\n")
   }
 }
 
-public extension Dictionary where Value == Any? {}
-public extension ComparisonResult {
+extension Dictionary where Value == Any? {}
+extension ComparisonResult {
   /// This is a shorthand for `.ordered Ascending`.
-  static var ascending: ComparisonResult {
+  public static var ascending: ComparisonResult {
     .orderedAscending
   }
 
   /// This is a shorthand for `.orderedDescending`.
-  static var descending: ComparisonResult {
+  public static var descending: ComparisonResult {
     .orderedDescending
   }
 }

@@ -18,7 +18,8 @@ public struct DroppableView: View {
     ///   - content: A view builder that provides the content to display within the thumbnail.
     public init(
       id: UUID = UUID(),
-      @ViewBuilder content: () -> any View) {
+      @ViewBuilder content: () -> any View
+    ) {
       self.id = id
       self.content = content()
     }
@@ -46,7 +47,8 @@ public struct DroppableView: View {
     ///   - content: A view builder that provides the content to display within the expanded view.
     public init(
       id: UUID = UUID(),
-      @ViewBuilder content: () -> any View) {
+      @ViewBuilder content: () -> any View
+    ) {
       self.id = id
       self.content = content()
     }
@@ -95,7 +97,8 @@ public struct DroppableView: View {
     expandedViewBackgroundColor: Color = Color(.secondarySystemFill),
     thumbnailViewCornerRadius: CGFloat = 6,
     expandedViewCornerRadius: CGFloat = 6,
-    textToCopy: String) {
+    textToCopy: String
+  ) {
     self.thumbnail = thumbnail
     self.expanded = expanded
     self.thumbnailViewBackgroundColor = thumbnailViewBackgroundColor
@@ -108,27 +111,30 @@ public struct DroppableView: View {
   /// Content
   /// The view content for the droppable view, which toggles between thumbnail and expanded state on button tap.
   public var body: some View {
-    Button(action: {
-      if self.show {}
-      withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-        self.show.toggle()
-      }
-    }, label: {
-      ZStack {
-        if !self.show {
-          self.thumbnailView()
-        } else {
-          self.expandedView()
+    Button(
+      action: {
+        if self.show {}
+        withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+          self.show.toggle()
+        }
+      },
+      label: {
+        ZStack {
+          if !self.show {
+            self.thumbnailView()
+          } else {
+            self.expandedView()
+          }
         }
       }
-    })
+    )
     .contextMenu {
       Button("Copy text", systemImage: "doc.on.doc", role: .destructive) {
         #if os(macOS)
-          NSPasteboard.general.clearContents()
-          NSPasteboard.general.setString(self.textToCopy, forType: .string)
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(self.textToCopy, forType: .string)
         #else
-          UIPasteboard.general.string = self.textToCopy
+        UIPasteboard.general.string = self.textToCopy
         #endif
       }
     }

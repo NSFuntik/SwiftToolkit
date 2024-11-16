@@ -1,26 +1,27 @@
 import SwiftUI
 
-public extension Binding {
+extension Binding {
   /// Specifies the feedback to perform when the binding value changes.
   /// - Parameter feedback: Feedback performed when the binding value changes.
   ///
   /// - Returns: A new binding.
-  func feedback(_ feedback: AnyFeedback) -> Self {
+  public func feedback(_ feedback: AnyFeedback) -> Self {
     Binding(
       get: { wrappedValue },
       set: { newValue in
         withFeedback(feedback) { wrappedValue = newValue }
-      })
+      }
+    )
   }
 }
 
-public extension Binding where Value: BinaryFloatingPoint {
+extension Binding where Value: BinaryFloatingPoint {
   /// Specifies the feedback to perform when the binding value changes.
   /// - Parameter feedback: Feedback performed when the binding value changes.
   /// - Parameter step: The step required to trigger a binding change
   ///
   /// - Returns: A new binding.
-  func feedback(_ feedback: AnyFeedback, step: Value) -> Self {
+  public func feedback(_ feedback: AnyFeedback, step: Value) -> Self {
     Binding(
       get: { wrappedValue },
       set: { newValue in
@@ -32,17 +33,18 @@ public extension Binding where Value: BinaryFloatingPoint {
         } else {
           wrappedValue = newValue
         }
-      })
+      }
+    )
   }
 }
 
-public extension Binding where Value: BinaryInteger {
+extension Binding where Value: BinaryInteger {
   /// Specifies the feedback to perform when the binding value changes.
   /// - Parameter feedback: Feedback performed when the binding value changes.
   /// - Parameter step: The step required to trigger a binding change
   ///
   /// - Returns: A new binding.
-  func feedback(_ feedback: AnyFeedback, step: Value) -> Self {
+  public func feedback(_ feedback: AnyFeedback, step: Value) -> Self {
     Binding(
       get: { wrappedValue },
       set: { newValue in
@@ -54,6 +56,7 @@ public extension Binding where Value: BinaryInteger {
         } else {
           wrappedValue = newValue
         }
-      })
+      }
+    )
   }
 }

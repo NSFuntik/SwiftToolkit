@@ -17,11 +17,9 @@ public actor AsyncPassthroughSubject<Element> {
   /// Initializes an instance of AsyncPassthroughSubject.
   public init() {}
 
-  /**
-   Creates an asynchronous stream for receiving notifications of elements.
-
-   - Returns: An `AsyncStream` of type `Element`.
-   */
+  /// Creates an asynchronous stream for receiving notifications of elements.
+  ///
+  /// - Returns: An `AsyncStream` of type `Element`.
   public func notifications() -> AsyncStream<Element> {
     AsyncStream { [weak self] continuation in
       let task = Task { [weak self] in
@@ -34,13 +32,12 @@ public actor AsyncPassthroughSubject<Element> {
     }
   }
 
-  /**
-   Sends an element to all subscribed tasks.
-
-   - Parameter element: The element to be sent.
-   */
+  /// Sends an element to all subscribed tasks.
+  ///
+  /// - Parameter element: The element to be sent.
   public nonisolated
-  func send(_ element: Element) {
+    func send(_ element: Element)
+  {
     Task { await _send(element) }
   }
 
@@ -51,20 +48,17 @@ public actor AsyncPassthroughSubject<Element> {
     }
   }
 
-  /**
-   Stores the provided continuation for future notifications.
-
-   - Parameter continuation: The continuation to be stored.
-   */
+  /// Stores the provided continuation for future notifications.
+  ///
+  /// - Parameter continuation: The continuation to be stored.
   func storeContinuation(_ continuation: AsyncStream<Element>.Continuation) {
     tasks.append(continuation)
   }
 
-  /**
-   Finishes all pending tasks associated with the subject.
-   */
+  /// Finishes all pending tasks associated with the subject.
   public nonisolated
-  func finish() {
+    func finish()
+  {
     Task { await _finish() }
   }
 

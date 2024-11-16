@@ -40,7 +40,7 @@ public enum SplitSide: String {
 }
 
 /// A SplitSide is generally optional. If so, then if nil, it is neither primary nor secondary.
-public extension Optional where Wrapped == SplitSide {
-  var isPrimary: Bool { self == nil ? false : self!.isPrimary }
-  var isSecondary: Bool { self == nil ? false : self!.isSecondary }
+extension Optional where Wrapped == SplitSide {
+  public var isPrimary: Bool { self == nil ? false : self!.isPrimary }
+  public var isSecondary: Bool { self == nil ? false : self!.isSecondary }
 }

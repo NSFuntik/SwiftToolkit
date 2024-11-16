@@ -36,11 +36,20 @@ public struct HSplit<P: View, D: SplitDivider, S: View>: View {
   ///   - right: A closure returning the secondary view.
   public init(
     @ViewBuilder left: @escaping () -> P,
-    @ViewBuilder right: @escaping () -> S) where D == Splitter {
+    @ViewBuilder right: @escaping () -> S
+  ) where D == Splitter {
     let fraction = FractionHolder()
     let hide = SideHolder()
     let constraints = SplitConstraints()
-    self.init(fraction: fraction, hide: hide, constraints: constraints, onDrag: nil, primary: { left() }, splitter: { D() }, secondary: { right() })
+    self.init(
+      fraction: fraction,
+      hide: hide,
+      constraints: constraints,
+      onDrag: nil,
+      primary: { left() },
+      splitter: { D() },
+      secondary: { right() }
+    )
   }
 
   /// Initializes a new `HSplit` with custom settings for fraction, hide, constraints, and behavior during dragging.
@@ -59,7 +68,8 @@ public struct HSplit<P: View, D: SplitDivider, S: View>: View {
     onDrag: ((CGFloat) -> Void)?,
     @ViewBuilder primary: @escaping () -> P,
     @ViewBuilder splitter: @escaping () -> D,
-    @ViewBuilder secondary: @escaping () -> S) {
+    @ViewBuilder secondary: @escaping () -> S
+  ) {
     self.fraction = fraction
     self.hide = hide
     self.constraints = constraints
@@ -77,7 +87,15 @@ public struct HSplit<P: View, D: SplitDivider, S: View>: View {
   public func splitter<T>(
     @ViewBuilder _ splitter: @escaping () -> T
   ) -> HSplit<P, T, S> where T: View {
-    return HSplit<P, T, S>(fraction: fraction, hide: hide, constraints: constraints, onDrag: onDrag, primary: { primary }, splitter: splitter, secondary: { secondary })
+    return HSplit<P, T, S>(
+      fraction: fraction,
+      hide: hide,
+      constraints: constraints,
+      onDrag: onDrag,
+      primary: { primary },
+      splitter: splitter,
+      secondary: { secondary }
+    )
   }
 
   /// Return a new instance of HSplit with `constraints` set to these values.
@@ -92,9 +110,24 @@ public struct HSplit<P: View, D: SplitDivider, S: View>: View {
     minSFraction: CGFloat? = nil,
     priority: SplitSide? = nil,
     dragToHideP: Bool = false,
-    dragToHideS: Bool = false) -> HSplit {
-    let constraints = SplitConstraints(minPFraction: minPFraction, minSFraction: minSFraction, priority: priority, dragToHideP: dragToHideP, dragToHideS: dragToHideS)
-    return HSplit(fraction: fraction, hide: hide, constraints: constraints, onDrag: onDrag, primary: { primary }, splitter: { splitter }, secondary: { secondary })
+    dragToHideS: Bool = false
+  ) -> HSplit {
+    let constraints = SplitConstraints(
+      minPFraction: minPFraction,
+      minSFraction: minSFraction,
+      priority: priority,
+      dragToHideP: dragToHideP,
+      dragToHideS: dragToHideS
+    )
+    return HSplit(
+      fraction: fraction,
+      hide: hide,
+      constraints: constraints,
+      onDrag: onDrag,
+      primary: { primary },
+      splitter: { splitter },
+      secondary: { secondary }
+    )
   }
 
   /// Return a new instance of HSplit with `onDrag` set to `callback`.
@@ -112,7 +145,8 @@ public struct HSplit<P: View, D: SplitDivider, S: View>: View {
       onDrag: callback,
       primary: { primary },
       splitter: { splitter },
-      secondary: { secondary })
+      secondary: { secondary }
+    )
   }
 
   /// Return a new instance of HSplit with its `splitter.styling` set to these values.
@@ -127,16 +161,39 @@ public struct HSplit<P: View, D: SplitDivider, S: View>: View {
     inset: CGFloat? = nil,
     visibleThickness: CGFloat? = nil,
     invisibleThickness: CGFloat? = nil,
-    hideSplitter: Bool = false) -> HSplit {
-    let styling = SplitStyling(color: color, inset: inset, visibleThickness: visibleThickness, invisibleThickness: invisibleThickness, hideSplitter: hideSplitter)
+    hideSplitter: Bool = false
+  ) -> HSplit {
+    let styling = SplitStyling(
+      color: color,
+      inset: inset,
+      visibleThickness: visibleThickness,
+      invisibleThickness: invisibleThickness,
+      hideSplitter: hideSplitter
+    )
     splitter.styling.reset(from: styling)
-    return HSplit(fraction: fraction, hide: hide, constraints: constraints, onDrag: onDrag, primary: { primary }, splitter: { splitter }, secondary: { secondary })
+    return HSplit(
+      fraction: fraction,
+      hide: hide,
+      constraints: constraints,
+      onDrag: onDrag,
+      primary: { primary },
+      splitter: { splitter },
+      secondary: { secondary }
+    )
   }
 
   /// Return a new instance of HSplit with `fraction` set to this FractionHolder
   /// - Parameter fraction: The FractionHolder to set.
   public func fraction(_ fraction: FractionHolder) -> HSplit<P, D, S> {
-    HSplit(fraction: fraction, hide: hide, constraints: constraints, onDrag: onDrag, primary: { primary }, splitter: { splitter }, secondary: { secondary })
+    HSplit(
+      fraction: fraction,
+      hide: hide,
+      constraints: constraints,
+      onDrag: onDrag,
+      primary: { primary },
+      splitter: { splitter },
+      secondary: { secondary }
+    )
   }
 
   /// Return a new instance of HSplit with `fraction` set to a FractionHolder holding onto this CGFloat
@@ -148,7 +205,15 @@ public struct HSplit<P: View, D: SplitDivider, S: View>: View {
   /// Return a new instance of HSplit with `hide` set to this SideHolder
   /// - Parameter side: The SideHolder to hide.
   public func hide(_ side: SideHolder) -> HSplit<P, D, S> {
-    HSplit(fraction: fraction, hide: side, constraints: constraints, onDrag: onDrag, primary: { primary }, splitter: { splitter }, secondary: { secondary })
+    HSplit(
+      fraction: fraction,
+      hide: side,
+      constraints: constraints,
+      onDrag: onDrag,
+      primary: { primary },
+      splitter: { splitter },
+      secondary: { secondary }
+    )
   }
 
   /// Return a new instance of HSplit with `hide` set to a SideHolder holding onto this SplitSide
@@ -170,15 +235,19 @@ struct HSplit_Previews: PreviewProvider {
           bottom: {
             HSplit(
               left: { Color.blue },
-              right: { Color.yellow })
-          })
-      })
+              right: { Color.yellow }
+            )
+          }
+        )
+      }
+    )
     HSplit(
       left: {
         VSplit(top: { Color.red }, bottom: { Color.green })
       },
       right: {
         VSplit(top: { Color.yellow }, bottom: { Color.blue })
-      })
+      }
+    )
   }
 }

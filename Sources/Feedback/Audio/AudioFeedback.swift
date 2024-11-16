@@ -1,26 +1,26 @@
-import SwiftUI
 import CoreAudio
+import SwiftUI
 
-public extension AnyFeedback {
+extension AnyFeedback {
   /// Specifies feedback that plays an audio file
   /// - Parameter audio: The audio to play when this feedback is triggered
-  static func audio(_ audio: Audio) -> Self {
+  public static func audio(_ audio: Audio) -> Self {
     .init(AudioFeedback(audio: audio))
   }
 }
 
-public extension View {
+extension View {
   /// Specifies feedback that plays an audio file
   /// - Parameter audio: The audio to play when this feedback is triggered
-  func audio(_ audio: Audio) -> some View {
+  public func audio(_ audio: Audio) -> some View {
     self.modifier(AudioFeedback(audio: audio))
   }
 }
 
-public extension Audio {
+extension Audio {
   /// Plays the audio file
   @MainActor
-  func play() async throws {
+  public func play() async throws {
     try await AudioPlayer.shared.play(audio: self)
   }
 }
@@ -32,8 +32,8 @@ public struct AudioPlayerEnvironmentKey: @preconcurrency EnvironmentKey {
   public static let defaultValue = AudioPlayer.shared
 }
 
-public extension EnvironmentValues {
-  var audioPlayer: AudioPlayer {
+extension EnvironmentValues {
+  public var audioPlayer: AudioPlayer {
     get { self[AudioPlayerEnvironmentKey.self] }
     set { self[AudioPlayerEnvironmentKey.self] = newValue }
   }

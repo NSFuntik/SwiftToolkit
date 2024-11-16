@@ -7,13 +7,13 @@
 
 // MARK: - SplitDivider
 
+import SwiftUI
+
 /// Custom splitters must conform to SplitDivider, just like the default `Splitter`.
 @MainActor
 public protocol SplitDivider: View {
   var styling: SplitStyling { get }
 }
-
-import SwiftUI
 
 // MARK: - Splitter
 
@@ -28,7 +28,7 @@ import SwiftUI
 public struct Splitter: SplitDivider {
   @EnvironmentObject private var layout: LayoutHolder
   @ObservedObject public var styling: SplitStyling
-  @State private var dividerColor: Color // Changes based on styling.previewHide
+  @State private var dividerColor: Color  // Changes based on styling.previewHide
   private var color: Color { privateColor ?? styling.color }
   private var inset: CGFloat { privateInset ?? styling.inset }
   private var visibleThickness: CGFloat { privateVisibleThickness ?? styling.visibleThickness }
@@ -66,7 +66,7 @@ public struct Splitter: SplitDivider {
       }
     }
     .contentShape(Rectangle())
-    .task { dividerColor = color } // Otherwise, styling.color does not appear at open
+    .task { dividerColor = color }  // Otherwise, styling.color does not appear at open
     // If we are previewing hiding a side using drag-to-hide, and the splitter will be
     // hidden when the side is hidden (styling.hideSplitter is true), then set the
     // splitter color to clear. When the splitter is actually hidden, it doesn't even
@@ -82,23 +82,33 @@ public struct Splitter: SplitDivider {
     // on hover doesn't work on iOS.
     .onHover { inside in
       #if targetEnvironment(macCatalyst) || os(macOS)
-        // With nested split views, it's possible to transition from one Splitter to another,
-        // so we always need to pop the current cursor (a no-op when it's the only one). We
-        // may or may not push the hover cursor depending on whether it's inside or not.
-        NSCursor.pop()
-        if inside {
-          layout.isHorizontal ? NSCursor.resizeLeftRight.push() : NSCursor.resizeUpDown.push()
-        }
+      // With nested split views, it's possible to transition from one Splitter to another,
+      // so we always need to pop the current cursor (a no-op when it's the only one). We
+      // may or may not push the hover cursor depending on whether it's inside or not.
+      NSCursor.pop()
+      if inside {
+        layout.isHorizontal ? NSCursor.resizeLeftRight.push() : NSCursor.resizeUpDown.push()
+      }
       #endif
     }
   }
 
-  public init(color: Color? = nil, inset: CGFloat? = nil, visibleThickness: CGFloat? = nil, invisibleThickness: CGFloat? = nil) {
+  public init(
+    color: Color? = nil,
+    inset: CGFloat? = nil,
+    visibleThickness: CGFloat? = nil,
+    invisibleThickness: CGFloat? = nil
+  ) {
     privateColor = color
     privateInset = inset
     privateVisibleThickness = visibleThickness
     privateInvisibleThickness = invisibleThickness
-    styling = SplitStyling(color: color, inset: inset, visibleThickness: visibleThickness, invisibleThickness: invisibleThickness)
+    styling = SplitStyling(
+      color: color,
+      inset: inset,
+      visibleThickness: visibleThickness,
+      invisibleThickness: invisibleThickness
+    )
     _dividerColor = State(initialValue: color ?? Self.defaultColor)
   }
 

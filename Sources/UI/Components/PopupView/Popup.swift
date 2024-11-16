@@ -45,7 +45,7 @@ import SwiftUI
 //  }
 // }
 
-public extension View {
+extension View {
   /// Presents a popup view using a specified item and alignment.
   ///
   /// - Parameters:
@@ -53,10 +53,11 @@ public extension View {
   ///   - item: A binding to an optional item that triggers the popup when non-nil.
   ///   - content: A closure that returns the content of the popup based on the provided item.
   /// - Returns: A view modified to show a popup if the item is non-nil.
-  func popup<PopupContent: View, Item: Hashable>(
+  public func popup<PopupContent: View, Item: Hashable>(
     alignment: Alignment,
     item: Binding<Item?>,
-    @ViewBuilder content: @escaping (Item) -> PopupContent) -> some View {
+    @ViewBuilder content: @escaping (Item) -> PopupContent
+  ) -> some View {
     self
       .allowsHitTesting((item.wrappedValue == nil))
       .modifier(Popup(alignment: alignment, item: item, content: content))
@@ -68,14 +69,17 @@ public extension View {
   ///   - popup: A binding to an optional `Popup` instance.
   /// - Returns: A view modified to show a popup if the `Popup` instance is non-nil.
   @ViewBuilder
-  func popup<PopupContent: View, Item: Hashable>(
+  public func popup<PopupContent: View, Item: Hashable>(
     popup: Binding<Popup<PopupContent, Item>?>
   ) -> some View {
     if let popup = popup.wrappedValue {
       self
         .allowsHitTesting((popup.item == nil))
         .popup(
-          alignment: popup.alignment, item: popup.$item, content: popup.popup!)
+          alignment: popup.alignment,
+          item: popup.$item,
+          content: popup.popup!
+        )
     } else {
       self
     }
@@ -88,14 +92,16 @@ public extension View {
   ///   - isPresented: A binding to a Boolean that controls the visibility of the popup.
   ///   - content: A closure that returns the content of the popup based on the visibility state.
   /// - Returns: A view modified to show a popup based on the visibility state.
-  func popup<PopupContent: View>(
+  public func popup<PopupContent: View>(
     alignment: Alignment = .bottom,
     isPresented: Binding<Bool>,
-    @ViewBuilder content: @escaping () -> PopupContent) -> some View {
+    @ViewBuilder content: @escaping () -> PopupContent
+  ) -> some View {
     self
       .allowsHitTesting(!isPresented.wrappedValue)
       .modifier(
-        Popup(alignment: alignment, isPresented: isPresented, content: content))
+        Popup(alignment: alignment, isPresented: isPresented, content: content)
+      )
   }
 }
 
@@ -113,7 +119,9 @@ public extension View {
 public struct Popup<PopupContent: View, Item: Hashable>: ViewModifier, Hashable {
   /// Compares two `Popup` instances for equality.
   public static func == (
-    lhs: Popup<PopupContent, Item>, rhs: Popup<PopupContent, Item>) -> Bool {
+    lhs: Popup<PopupContent, Item>,
+    rhs: Popup<PopupContent, Item>
+  ) -> Bool {
     return lhs.alignment == rhs.alignment && lhs.item == rhs.item
       && lhs.hashValue == rhs.hashValue
   }
@@ -152,54 +160,56 @@ public struct Popup<PopupContent: View, Item: Hashable>: ViewModifier, Hashable 
           .overlay(alignment: alignment) {
             popupContent
 
-                .viewSize($size)
-                .offset(y: offset)
-                .gesture(
-                  DragGesture()
-                    .onChanged { value in
+              .viewSize($size)
+              .offset(y: offset)
+              .gesture(
+                DragGesture()
+                  .onChanged { value in
+                    if alignment == .bottom {
+                      if value.translation.height < size.height {
+                        withAnimation {
+                          offset = value.translation.height
+                        }
+                      }
+                    } else if alignment == .top {
+                      if value.translation.height > -size.height {
+                        withAnimation {
+                          offset = value.translation.height
+                        }
+                      }
+                    }
+                  }
+                  .onEnded { _ in
+                    withAnimation {
                       if alignment == .bottom {
-                        if value.translation.height < size.height {
-                          withAnimation {
-                            offset = value.translation.height
-                          }
+                        if offset <= size.height / 2 {
+                          offset = 0
+                        } else {
+                          hidePopup()
+                          offset = 0
                         }
                       } else if alignment == .top {
-                        if value.translation.height > -size.height {
-                          withAnimation {
-                            offset = value.translation.height
-                          }
+                        if offset >= -size.height / 2 {
+                          offset = 0
+                        } else {
+                          hidePopup()
+                          offset = 0
                         }
                       }
                     }
-                    .onEnded { _ in
-                      withAnimation {
-                        if alignment == .bottom {
-                          if offset <= size.height / 2 {
-                            offset = 0
-                          } else {
-                            hidePopup()
-                            offset = 0
-                          }
-                        } else if alignment == .top {
-                          if offset >= -size.height / 2 {
-                            offset = 0
-                          } else {
-                            hidePopup()
-                            offset = 0
-                          }
-                        }
-                      }
-                    }
-                )
-                .onAppear(perform: {
-                  if shouldDismiss {
-                    DispatchQueue.main.asyncAfter(
-                      deadline: .now() + 1.5,
-                      execute: hidePopup)
                   }
-                })
-                .background(
-                  Color.black.opacity(0.3).onTapGesture {})
+              )
+              .onAppear(perform: {
+                if shouldDismiss {
+                  DispatchQueue.main.asyncAfter(
+                    deadline: .now() + 1.5,
+                    execute: hidePopup
+                  )
+                }
+              })
+              .background(
+                Color.black.opacity(0.3).onTapGesture {}
+              )
           }
           .padding(16, 12)
           .clipped()
@@ -239,7 +249,8 @@ public struct Popup<PopupContent: View, Item: Hashable>: ViewModifier, Hashable 
   public init(
     alignment: Alignment = .top,
     item: Binding<Item?>,
-    @ViewBuilder content: @escaping (Item) -> PopupContent) {
+    @ViewBuilder content: @escaping (Item) -> PopupContent
+  ) {
     self.alignment = alignment
     self._item = item
     self.popup = content
@@ -257,7 +268,8 @@ public struct Popup<PopupContent: View, Item: Hashable>: ViewModifier, Hashable 
   public init(
     alignment: Alignment = .top,
     isPresented: Binding<Bool>,
-    @ViewBuilder content: @escaping () -> PopupContent) where Item == Bool {
+    @ViewBuilder content: @escaping () -> PopupContent
+  ) where Item == Bool {
     self.alignment = alignment
     self.shouldDismiss = false
     self._isPresented = isPresented

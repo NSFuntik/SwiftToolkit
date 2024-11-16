@@ -9,14 +9,12 @@ import Foundation
 //  Created by Dmitry Mikhaylov on 11.03.2024.
 //
 
-import Foundation
-
-public extension Encodable {
-  subscript(key: String) -> Sendable? {
+extension Encodable {
+  public subscript(key: String) -> Sendable? {
     return dictionary[key]
   }
 
-  var dictionary: [String: Any] {
+  public var dictionary: [String: Any] {
     return (try? JSONSerialization.jsonObject(with: JSONEncoder().encode(self))) as? [String: Any] ?? [:]
   }
 }
@@ -58,7 +56,9 @@ extension JSONError: CustomNSError {
     case .invalidJSON:
       return [NSLocalizedDescriptionKey: "JSON is invalid."]
     case .elementTooDeep:
-      return [NSLocalizedDescriptionKey: "Element too deep. Increase maxObjectDepth and make sure there is no reference loop."]
+      return [
+        NSLocalizedDescriptionKey: "Element too deep. Increase maxObjectDepth and make sure there is no reference loop."
+      ]
     case .notNSDictionary:
       return [NSLocalizedDescriptionKey: "Couldn't merge, NOT NSDictionary type"]
     case .notArray:
@@ -347,9 +347,7 @@ extension JSON: Swift.Collection {
 
 // MARK: - JSONKey
 
-/**
- *  To mark both String and Int can be used in subscript.
- */
+/// To mark both String and Int can be used in subscript.
 public enum JSONKey {
   case index(Int)
   case key(String)
@@ -394,9 +392,7 @@ extension JSON {
       }
     }
     set {
-      if _type == .array &&
-        rawArray.indices.contains(index) &&
-        newValue.error == nil {
+      if _type == .array && rawArray.indices.contains(index) && newValue.error == nil {
         rawArray[index] = newValue.object
       }
     }
@@ -568,7 +564,11 @@ extension JSON: Swift.RawRepresentable {
     return object
   }
 
-  public func rawData(options opt: JSONSerialization.WritingOptions = JSONSerialization.WritingOptions(rawValue: 0)) throws -> Data {
+  public func rawData(
+    options opt: JSONSerialization.WritingOptions = JSONSerialization.WritingOptions(rawValue: 0)
+  )
+    throws -> Data
+  {
     guard JSONSerialization.isValidJSONObject(object) else {
       throw JSONError.invalidJSON
     }
@@ -576,7 +576,10 @@ extension JSON: Swift.RawRepresentable {
     return try JSONSerialization.data(withJSONObject: object, options: opt)
   }
 
-  public func rawString(_ encoding: String.Encoding = .utf8, options opt: JSONSerialization.WritingOptions = .prettyPrinted) -> String? {
+  public func rawString(
+    _ encoding: String.Encoding = .utf8,
+    options opt: JSONSerialization.WritingOptions = .prettyPrinted
+  ) -> String? {
     do {
       return try _rawString(encoding, options: [.jsonSerialization: opt])
     } catch {
@@ -596,13 +599,19 @@ extension JSON: Swift.RawRepresentable {
     }
   }
 
-  fileprivate func _rawString(_ encoding: String.Encoding = .utf8, options: [writingOptionsKeys: Any], maxObjectDepth: Int = 10) throws -> String? {
+  fileprivate func _rawString(
+    _ encoding: String.Encoding = .utf8,
+    options: [writingOptionsKeys: Any],
+    maxObjectDepth: Int = 10
+  ) throws -> String? {
     guard maxObjectDepth > 0 else { throw JSONError.invalidJSON }
     switch _type {
     case .dictionary:
       do {
         if !(options[.castNilToNSNull] as? Bool ?? false) {
-          let jsonOption = options[.jsonSerialization] as? JSONSerialization.WritingOptions ?? JSONSerialization.WritingOptions.prettyPrinted
+          let jsonOption =
+            options[.jsonSerialization] as? JSONSerialization.WritingOptions
+            ?? JSONSerialization.WritingOptions.prettyPrinted
           let data = try rawData(options: jsonOption)
           return String(data: data, encoding: encoding)
         }
@@ -619,11 +628,18 @@ extension JSON: Swift.RawRepresentable {
           }
 
           let nestedValue = JSON(unwrappedValue)
-          guard let nestedString = try nestedValue._rawString(encoding, options: options, maxObjectDepth: maxObjectDepth - 1) else {
+          guard
+            let nestedString = try nestedValue._rawString(
+              encoding,
+              options: options,
+              maxObjectDepth: maxObjectDepth - 1
+            )
+          else {
             throw JSONError.elementTooDeep
           }
           if nestedValue._type == .string {
-            return "\"\(key)\": \"\(nestedString.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: "\\\""))\""
+            return
+              "\"\(key)\": \"\(nestedString.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: "\\\""))\""
           } else {
             return "\"\(key)\": \(nestedString)"
           }
@@ -636,7 +652,9 @@ extension JSON: Swift.RawRepresentable {
     case .array:
       do {
         if !(options[.castNilToNSNull] as? Bool ?? false) {
-          let jsonOption = options[.jsonSerialization] as? JSONSerialization.WritingOptions ?? JSONSerialization.WritingOptions.prettyPrinted
+          let jsonOption =
+            options[.jsonSerialization] as? JSONSerialization.WritingOptions
+            ?? JSONSerialization.WritingOptions.prettyPrinted
           let data = try rawData(options: jsonOption)
           return String(data: data, encoding: encoding)
         }
@@ -650,11 +668,18 @@ extension JSON: Swift.RawRepresentable {
           }
 
           let nestedValue = JSON(unwrappedValue)
-          guard let nestedString = try nestedValue._rawString(encoding, options: options, maxObjectDepth: maxObjectDepth - 1) else {
+          guard
+            let nestedString = try nestedValue._rawString(
+              encoding,
+              options: options,
+              maxObjectDepth: maxObjectDepth - 1
+            )
+          else {
             throw JSONError.invalidJSON
           }
           if nestedValue._type == .string {
-            return "\"\(nestedString.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: "\\\""))\""
+            return
+              "\"\(nestedString.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: "\\\""))\""
           } else {
             return nestedString
           }
@@ -687,19 +712,19 @@ extension JSON: Swift.CustomStringConvertible, Swift.CustomDebugStringConvertibl
 
 // MARK: - Array
 
-public extension JSON {
+extension JSON {
   /// Optional [JSON]
-  var array: [JSON]? {
+  public var array: [JSON]? {
     return _type == .array ? rawArray.map { JSON($0) } : nil
   }
 
   /// Non-optional [JSON]
-  var arrayValue: [JSON] {
+  public var arrayValue: [JSON] {
     return self.array ?? []
   }
 
   /// Optional [Any]
-  var arrayObject: [Any]? {
+  public var arrayObject: [Any]? {
     get {
       switch _type {
       case .array: return rawArray
@@ -714,9 +739,9 @@ public extension JSON {
 
 // MARK: - Dictionary
 
-public extension JSON {
+extension JSON {
   /// Optional [String : JSON]
-  var dictionary: [String: JSON]? {
+  public var dictionary: [String: JSON]? {
     if _type == .dictionary {
       var d = [String: JSON](minimumCapacity: rawDictionary.count)
       for pair in rawDictionary {
@@ -729,13 +754,13 @@ public extension JSON {
   }
 
   /// Non-optional [String : JSON]
-  var dictionaryValue: [String: JSON] {
+  public var dictionaryValue: [String: JSON] {
     return dictionary ?? [:]
   }
 
   // Optional [String : Any]
 
-  var dictionaryObject: [String: Any]? {
+  public var dictionaryObject: [String: Any]? {
     get {
       switch _type {
       case .dictionary: return rawDictionary
@@ -750,9 +775,9 @@ public extension JSON {
 
 // MARK: - Bool
 
-public extension JSON { // : Swift.Bool
+extension JSON {  // : Swift.Bool
   /// Optional bool
-  var bool: Bool? {
+  public var bool: Bool? {
     get {
       switch _type {
       case .bool: return rawBool
@@ -765,12 +790,13 @@ public extension JSON { // : Swift.Bool
   }
 
   /// Non-optional bool
-  var boolValue: Bool {
+  public var boolValue: Bool {
     get {
       switch _type {
       case .bool: return rawBool
       case .number: return rawNumber.boolValue
-      case .string: return ["true", "y", "t", "yes", "1"].contains { rawString.caseInsensitiveCompare($0) == .orderedSame }
+      case .string:
+        return ["true", "y", "t", "yes", "1"].contains { rawString.caseInsensitiveCompare($0) == .orderedSame }
       default: return false
       }
     }
@@ -782,9 +808,9 @@ public extension JSON { // : Swift.Bool
 
 // MARK: - String
 
-public extension JSON {
+extension JSON {
   /// Optional string
-  var string: String? {
+  public var string: String? {
     get {
       switch _type {
       case .string: return object as? String
@@ -797,7 +823,7 @@ public extension JSON {
   }
 
   /// Non-optional string
-  var stringValue: String {
+  public var stringValue: String {
     get {
       switch _type {
       case .string: return object as? String ?? ""
@@ -814,9 +840,9 @@ public extension JSON {
 
 // MARK: - Number
 
-public extension JSON {
+extension JSON {
   /// Optional number
-  var number: NSNumber? {
+  public var number: NSNumber? {
     get {
       switch _type {
       case .number: return rawNumber
@@ -830,7 +856,7 @@ public extension JSON {
   }
 
   /// Non-optional number
-  var numberValue: NSNumber {
+  public var numberValue: NSNumber {
     get {
       switch _type {
       case .string:
@@ -849,8 +875,8 @@ public extension JSON {
 
 // MARK: - Null
 
-public extension JSON {
-  var null: NSNull? {
+extension JSON {
+  public var null: NSNull? {
     set {
       object = NSNull()
     }
@@ -862,8 +888,8 @@ public extension JSON {
     }
   }
 
-  func exists() -> Bool {
-    if let errorValue = error, (400 ... 1000).contains(errorValue.errorCode) {
+  public func exists() -> Bool {
+    if let errorValue = error, (400...1000).contains(errorValue.errorCode) {
       return false
     }
     return true
@@ -872,16 +898,18 @@ public extension JSON {
 
 // MARK: - URL
 
-public extension JSON {
+extension JSON {
   /// Optional URL
-  var url: URL? {
+  public var url: URL? {
     get {
       switch _type {
       case .string:
         // Check for existing percent escapes first to prevent double-escaping of % character
         if rawString.range(of: "%[0-9A-Fa-f]{2}", options: .regularExpression, range: nil, locale: nil) != nil {
           return Foundation.URL(string: rawString)
-        } else if let encodedString_ = rawString.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) {
+        } else if let encodedString_ = rawString.addingPercentEncoding(
+          withAllowedCharacters: CharacterSet.urlQueryAllowed
+        ) {
           // We have to use `Foundation.URL` otherwise it conflicts with the variable name.
           return Foundation.URL(string: encodedString_)
         } else {
@@ -899,8 +927,8 @@ public extension JSON {
 
 // MARK: - Int, Double, Float, Int8, Int16, Int32, Int64
 
-public extension JSON {
-  var double: Double? {
+extension JSON {
+  public var double: Double? {
     get {
       return number?.doubleValue
     }
@@ -913,7 +941,7 @@ public extension JSON {
     }
   }
 
-  var doubleValue: Double {
+  public var doubleValue: Double {
     get {
       return numberValue.doubleValue
     }
@@ -922,7 +950,7 @@ public extension JSON {
     }
   }
 
-  var float: Float? {
+  public var float: Float? {
     get {
       return number?.floatValue
     }
@@ -935,7 +963,7 @@ public extension JSON {
     }
   }
 
-  var floatValue: Float {
+  public var floatValue: Float {
     get {
       return numberValue.floatValue
     }
@@ -944,7 +972,7 @@ public extension JSON {
     }
   }
 
-  var int: Int? {
+  public var int: Int? {
     get {
       return number?.intValue
     }
@@ -957,7 +985,7 @@ public extension JSON {
     }
   }
 
-  var intValue: Int {
+  public var intValue: Int {
     get {
       return numberValue.intValue
     }
@@ -966,7 +994,7 @@ public extension JSON {
     }
   }
 
-  var uInt: UInt? {
+  public var uInt: UInt? {
     get {
       return number?.uintValue
     }
@@ -979,7 +1007,7 @@ public extension JSON {
     }
   }
 
-  var uIntValue: UInt {
+  public var uIntValue: UInt {
     get {
       return numberValue.uintValue
     }
@@ -988,7 +1016,7 @@ public extension JSON {
     }
   }
 
-  var int8: Int8? {
+  public var int8: Int8? {
     get {
       return number?.int8Value
     }
@@ -1001,7 +1029,7 @@ public extension JSON {
     }
   }
 
-  var int8Value: Int8 {
+  public var int8Value: Int8 {
     get {
       return numberValue.int8Value
     }
@@ -1010,7 +1038,7 @@ public extension JSON {
     }
   }
 
-  var uInt8: UInt8? {
+  public var uInt8: UInt8? {
     get {
       return number?.uint8Value
     }
@@ -1023,7 +1051,7 @@ public extension JSON {
     }
   }
 
-  var uInt8Value: UInt8 {
+  public var uInt8Value: UInt8 {
     get {
       return numberValue.uint8Value
     }
@@ -1032,7 +1060,7 @@ public extension JSON {
     }
   }
 
-  var int16: Int16? {
+  public var int16: Int16? {
     get {
       return number?.int16Value
     }
@@ -1045,7 +1073,7 @@ public extension JSON {
     }
   }
 
-  var int16Value: Int16 {
+  public var int16Value: Int16 {
     get {
       return numberValue.int16Value
     }
@@ -1054,7 +1082,7 @@ public extension JSON {
     }
   }
 
-  var uInt16: UInt16? {
+  public var uInt16: UInt16? {
     get {
       return number?.uint16Value
     }
@@ -1067,7 +1095,7 @@ public extension JSON {
     }
   }
 
-  var uInt16Value: UInt16 {
+  public var uInt16Value: UInt16 {
     get {
       return numberValue.uint16Value
     }
@@ -1076,7 +1104,7 @@ public extension JSON {
     }
   }
 
-  var int32: Int32? {
+  public var int32: Int32? {
     get {
       return number?.int32Value
     }
@@ -1089,7 +1117,7 @@ public extension JSON {
     }
   }
 
-  var int32Value: Int32 {
+  public var int32Value: Int32 {
     get {
       return numberValue.int32Value
     }
@@ -1098,7 +1126,7 @@ public extension JSON {
     }
   }
 
-  var uInt32: UInt32? {
+  public var uInt32: UInt32? {
     get {
       return number?.uint32Value
     }
@@ -1111,7 +1139,7 @@ public extension JSON {
     }
   }
 
-  var uInt32Value: UInt32 {
+  public var uInt32Value: UInt32 {
     get {
       return numberValue.uint32Value
     }
@@ -1120,7 +1148,7 @@ public extension JSON {
     }
   }
 
-  var int64: Int64? {
+  public var int64: Int64? {
     get {
       return number?.int64Value
     }
@@ -1133,7 +1161,7 @@ public extension JSON {
     }
   }
 
-  var int64Value: Int64 {
+  public var int64Value: Int64 {
     get {
       return numberValue.int64Value
     }
@@ -1142,7 +1170,7 @@ public extension JSON {
     }
   }
 
-  var uInt64: UInt64? {
+  public var uInt64: UInt64? {
     get {
       return number?.uint64Value
     }
@@ -1155,7 +1183,7 @@ public extension JSON {
     }
   }
 
-  var uInt64Value: UInt64 {
+  public var uInt64Value: UInt64 {
     get {
       return numberValue.uint64Value
     }
@@ -1231,7 +1259,9 @@ private let falseObjCType = String(cString: falseNumber.objCType)
 extension NSNumber {
   fileprivate var isBool: Bool {
     let objCType = String(cString: self.objCType)
-    if (self.compare(trueNumber) == .orderedSame && objCType == trueObjCType) || (self.compare(falseNumber) == .orderedSame && objCType == falseObjCType) {
+    if (self.compare(trueNumber) == .orderedSame && objCType == trueObjCType)
+      || (self.compare(falseNumber) == .orderedSame && objCType == falseObjCType)
+    {
       return true
     } else {
       return false
@@ -1285,8 +1315,8 @@ extension NSNumber {
 
 // MARK: - JSON: Codable
 
-public extension JSON {
-  enum writingOptionsKeys {
+extension JSON {
+  public enum writingOptionsKeys {
     case jsonSerialization
     case castNilToNSNull
     case maxObjextDepth
@@ -1313,7 +1343,7 @@ public extension JSON {
     ]
   }
 
-  init(from decoder: Decoder) throws {
+  public init(from decoder: Decoder) throws {
     var object: Any?
 
     if let container = try? decoder.singleValueContainer(), !container.decodeNil() {
@@ -1359,7 +1389,7 @@ public extension JSON {
     self.init(object ?? NSNull())
   }
 
-  func encode(to encoder: Encoder) throws {
+  public func encode(to encoder: Encoder) throws {
     var container = encoder.singleValueContainer()
     if object is NSNull {
       try container.encodeNil()

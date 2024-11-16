@@ -12,9 +12,9 @@ import Foundation
 /// Protocol for managed objects that can be accessed asynchronously
 public protocol ValueOnMoc {}
 
-public extension ValueOnMoc where Self: NSManagedObject {
+extension ValueOnMoc where Self: NSManagedObject {
   /// Async accessor for managed object properties
-  var async: AsyncValue<Self> { AsyncValue(value: self) }
+  public var async: AsyncValue<Self> { AsyncValue(value: self) }
 }
 
 // MARK: - AsyncValue
@@ -33,11 +33,11 @@ public struct AsyncValue<Value: NSManagedObject> {
 
 extension NSManagedObject: ValueOnMoc {}
 
-public extension NSManagedObject {
+extension NSManagedObject {
   /// Executes a block on the object's managed object context
   /// - Parameter block: Block to execute
   /// - Returns: Result of the block
-  func onMoc<T>(_ block: @escaping () -> T) async throws -> T {
+  public func onMoc<T>(_ block: @escaping () -> T) async throws -> T {
     guard let ctx = managedObjectContext else {
       throw CancellationError()
     }
@@ -56,11 +56,11 @@ public extension NSManagedObject {
 
 // MARK: - Database Extensions
 
-public extension Database {
+extension Database {
   /// Performs an edit operation in a private context
   /// - Parameter closure: Edit operation closure
   /// - Returns: Result of the operation
-  func edit<R>(_ closure: @escaping (_ ctx: NSManagedObjectContext) throws -> R) async throws -> R {
+  public func edit<R>(_ closure: @escaping (_ ctx: NSManagedObjectContext) throws -> R) async throws -> R {
     try await onEdit { [weak self] in
       guard let self = self else {
         throw CancellationError()
@@ -90,7 +90,7 @@ public extension Database {
   }
 
   /// Performs a non-throwing edit operation
-  func edit<R>(_ closure: @escaping (_ ctx: NSManagedObjectContext) -> R) async -> R {
+  public func edit<R>(_ closure: @escaping (_ ctx: NSManagedObjectContext) -> R) async -> R {
     (try? await onEdit { [weak self] in
       guard let self = self else {
         throw CancellationError()
@@ -116,9 +116,10 @@ public extension Database {
   }
 
   /// Edits a specific object by ID
-  func edit<T, R>(
+  public func edit<T, R>(
     _ objectId: ObjectId<T>,
-    _ closure: @escaping (T, _ ctx: NSManagedObjectContext) throws -> R) async throws -> R {
+    _ closure: @escaping (T, _ ctx: NSManagedObjectContext) throws -> R
+  ) async throws -> R {
     try await edit { ctx in
       guard let object = objectId.object(ctx) else {
         throw CancellationError()
@@ -128,16 +129,18 @@ public extension Database {
   }
 
   /// Edits a specific managed object
-  func edit<T: NSManagedObject, R>(
+  public func edit<T: NSManagedObject, R>(
     _ object: T,
-    _ closure: @escaping (T, _ ctx: NSManagedObjectContext) throws -> R) async throws -> R {
+    _ closure: @escaping (T, _ ctx: NSManagedObjectContext) throws -> R
+  ) async throws -> R {
     try await edit(object.getObjectId, closure)
   }
 
   /// Edits multiple managed objects
-  func edit<T: NSManagedObject, R>(
+  public func edit<T: NSManagedObject, R>(
     _ objects: [T],
-    _ closure: @escaping ([T], _ ctx: NSManagedObjectContext) throws -> R) async throws -> R {
+    _ closure: @escaping ([T], _ ctx: NSManagedObjectContext) throws -> R
+  ) async throws -> R {
     let ids = objects.ids
     return try await edit { ctx in
       try closure(ids.objects(ctx), ctx)
@@ -145,7 +148,7 @@ public extension Database {
   }
 
   /// Performs a fetch operation
-  func fetch<R>(
+  public func fetch<R>(
     _ closure: @escaping (_ ctx: NSManagedObjectContext) throws -> R
   ) async throws -> R {
     let context = createPrivateContext()
@@ -168,7 +171,7 @@ public extension Database {
   }
 
   /// Performs a non-throwing fetch operation
-  func fetch<R>(
+  public func fetch<R>(
     _ closure: @escaping (_ ctx: NSManagedObjectContext) -> R
   ) async -> R {
     let context = createPrivateContext()

@@ -4,10 +4,10 @@
 //
 //  Provides extensions for NSManagedObject with enhanced querying capabilities.
 
-import os.log
 import Combine
 import CoreData
 import Foundation
+import os.log
 
 // MARK: - ManagedObjectHelpers
 
@@ -41,13 +41,13 @@ extension KeyPath {
 
 // MARK: - NSPredicate Extensions
 
-public extension NSPredicate {
+extension NSPredicate {
   /// Creates a predicate comparing a property with a value
   /// - Parameters:
   ///   - keyString: Property key path string
   ///   - value: Value to compare against
   /// - Returns: Configured predicate
-  static func with<U>(_ keyString: String, _ value: U) -> NSPredicate {
+  public static func with<U>(_ keyString: String, _ value: U) -> NSPredicate {
     if let value = value as? CVarArg {
       return NSPredicate(format: "\(keyString) == %@", value as? NSNumber ?? value)
     } else if let value = value as? UUID {
@@ -62,17 +62,18 @@ public extension NSPredicate {
 
 // MARK: - ManagedObjectHelpers Extensions
 
-public extension ManagedObjectHelpers where Self: NSManagedObject {
+extension ManagedObjectHelpers where Self: NSManagedObject {
   /// Observes changes to this entity type
   /// - Parameter database: Database instance to observe
   /// - Returns: Publisher emitting changes
-  static func didChange(_ database: Database) -> AnyPublisher<Change<Self>, Never> {
+  public static func didChange(_ database: Database) -> AnyPublisher<Change<Self>, Never> {
     objectsDidChange(database)
       .map {
         Change(
           inserted: Set($0.inserted.map { ObjectId<Self>($0) }),
           updated: Set($0.updated.map { ObjectId<Self>($0) }),
-          deleted: Set($0.deleted.map { ObjectId<Self>($0) }))
+          deleted: Set($0.deleted.map { ObjectId<Self>($0) })
+        )
       }
       .eraseToAnyPublisher()
   }
@@ -81,14 +82,14 @@ public extension ManagedObjectHelpers where Self: NSManagedObject {
   /// - Parameter database: Database instance
   /// - Returns: Array of objects
   @MainActor
-  static func all(_ database: Database) -> [Self] {
+  public static func all(_ database: Database) -> [Self] {
     all(database.viewContext)
   }
 
   /// Retrieves all objects of this type from a context
   /// - Parameter ctx: Managed object context
   /// - Returns: Array of objects
-  static func all(_ ctx: NSManagedObjectContext) -> [Self] {
+  public static func all(_ ctx: NSManagedObjectContext) -> [Self] {
     let request = NSFetchRequest<Self>()
     do {
       return try ctx.execute(request: request)
@@ -102,14 +103,14 @@ public extension ManagedObjectHelpers where Self: NSManagedObject {
   /// - Parameter database: Database instance
   /// - Returns: Sorted array of objects
   @MainActor
-  static func allSorted(_ database: Database) -> [Self] {
+  public static func allSorted(_ database: Database) -> [Self] {
     allSorted(database.viewContext)
   }
 
   /// Retrieves all objects sorted by objectID from a context
   /// - Parameter ctx: Managed object context
   /// - Returns: Sorted array of objects
-  static func allSorted(_ ctx: NSManagedObjectContext) -> [Self] {
+  public static func allSorted(_ ctx: NSManagedObjectContext) -> [Self] {
     allSortedBy(key: \.objectID.description, ctx: ctx)
   }
 
@@ -120,10 +121,11 @@ public extension ManagedObjectHelpers where Self: NSManagedObject {
   ///   - database: Database instance
   /// - Returns: Sorted array of objects
   @MainActor
-  static func allSortedBy<U>(
+  public static func allSortedBy<U>(
     key: KeyPath<Self, U>,
     ascending: Bool = true,
-    _ database: Database) -> [Self] where U: Comparable {
+    _ database: Database
+  ) -> [Self] where U: Comparable {
     allSortedBy(key: key, ascending: ascending, ctx: database.viewContext)
   }
 
@@ -133,10 +135,11 @@ public extension ManagedObjectHelpers where Self: NSManagedObject {
   ///   - ascending: Sort order
   ///   - ctx: Managed object context
   /// - Returns: Sorted array of objects
-  static func allSortedBy<U>(
+  public static func allSortedBy<U>(
     key: KeyPath<Self, U>,
     ascending: Bool = true,
-    ctx: NSManagedObjectContext) -> [Self] where U: Comparable {
+    ctx: NSManagedObjectContext
+  ) -> [Self] where U: Comparable {
     let request = NSFetchRequest<Self>()
     request.sortDescriptors = [NSSortDescriptor(keyPath: key, ascending: ascending)]
 
@@ -155,10 +158,11 @@ public extension ManagedObjectHelpers where Self: NSManagedObject {
   ///   - database: Database instance
   /// - Returns: Matching objects
   @MainActor
-  static func find<U>(
+  public static func find<U>(
     _ keyPath: KeyPath<Self, U>,
     _ value: U,
-    _ database: Database) -> [Self] {
+    _ database: Database
+  ) -> [Self] {
     find(keyPath, value, ctx: database.viewContext)
   }
 
@@ -168,10 +172,11 @@ public extension ManagedObjectHelpers where Self: NSManagedObject {
   ///   - value: Value to match
   ///   - ctx: Managed object context
   /// - Returns: Matching objects
-  static func find<U>(
+  public static func find<U>(
     _ keyPath: KeyPath<Self, U>,
     _ value: U,
-    ctx: NSManagedObjectContext) -> [Self] {
+    ctx: NSManagedObjectContext
+  ) -> [Self] {
     find(predicate: .with(keyPath.asString, value), ctx: ctx)
   }
 
@@ -181,9 +186,10 @@ public extension ManagedObjectHelpers where Self: NSManagedObject {
   ///   - database: Database instance
   /// - Returns: Matching objects
   @MainActor
-  static func find(
+  public static func find(
     predicate: NSPredicate,
-    _ database: Database) -> [Self] {
+    _ database: Database
+  ) -> [Self] {
     find(predicate: predicate, ctx: database.viewContext)
   }
 
@@ -192,9 +198,10 @@ public extension ManagedObjectHelpers where Self: NSManagedObject {
   ///   - predicate: Predicate to match
   ///   - ctx: Managed object context
   /// - Returns: Matching objects
-  static func find(
+  public static func find(
     predicate: NSPredicate,
-    ctx: NSManagedObjectContext) -> [Self] {
+    ctx: NSManagedObjectContext
+  ) -> [Self] {
     let request = NSFetchRequest<Self>()
     request.predicate = predicate
 
@@ -213,10 +220,11 @@ public extension ManagedObjectHelpers where Self: NSManagedObject {
   ///   - database: Database instance
   /// - Returns: First matching object
   @MainActor
-  static func findFirst<U>(
+  public static func findFirst<U>(
     _ keyPath: KeyPath<Self, U>,
     _ value: U,
-    _ database: Database) -> Self? {
+    _ database: Database
+  ) -> Self? {
     findFirst(keyPath, value, ctx: database.viewContext)
   }
 
@@ -226,10 +234,11 @@ public extension ManagedObjectHelpers where Self: NSManagedObject {
   ///   - value: Value to match
   ///   - ctx: Managed object context
   /// - Returns: First matching object
-  static func findFirst<U>(
+  public static func findFirst<U>(
     _ keyPath: KeyPath<Self, U>,
     _ value: U,
-    ctx: NSManagedObjectContext) -> Self? {
+    ctx: NSManagedObjectContext
+  ) -> Self? {
     findFirst(.with(keyPath.asString, value), ctx: ctx)
   }
 
@@ -238,9 +247,10 @@ public extension ManagedObjectHelpers where Self: NSManagedObject {
   ///   - predicate: Predicate to match
   ///   - ctx: Managed object context
   /// - Returns: First matching object
-  static func findFirst(
+  public static func findFirst(
     _ predicate: NSPredicate,
-    ctx: NSManagedObjectContext) -> Self? {
+    ctx: NSManagedObjectContext
+  ) -> Self? {
     let request = NSFetchRequest<Self>()
     request.fetchLimit = 1
     request.predicate = predicate
@@ -248,7 +258,12 @@ public extension ManagedObjectHelpers where Self: NSManagedObject {
     do {
       return try ctx.execute(request: request).first
     } catch {
-      os_log("Failed to fetch first with predicate: %{public}@", log: .default, type: .error, error.localizedDescription)
+      os_log(
+        "Failed to fetch first with predicate: %{public}@",
+        log: .default,
+        type: .error,
+        error.localizedDescription
+      )
       return nil
     }
   }
@@ -256,19 +271,19 @@ public extension ManagedObjectHelpers where Self: NSManagedObject {
 
 // MARK: - NSManagedObject Extensions
 
-public extension NSManagedObject {
+extension NSManagedObject {
   /// Deletes the object from its context
-  func delete() {
+  public func delete() {
     managedObjectContext?.delete(self)
   }
 
   /// Checks if the object is deleted
-  var isObjectDeleted: Bool {
+  public var isObjectDeleted: Bool {
     managedObjectContext == nil || isDeleted
   }
 
   /// Gets the permanent object ID
-  var permanentObjectID: NSManagedObjectID {
+  public var permanentObjectID: NSManagedObjectID {
     var objectID = self.objectID
 
     if objectID.isTemporaryID {
@@ -279,21 +294,21 @@ public extension NSManagedObject {
   }
 
   /// Observes changes to this entity type
-  static func objectsDidChange(_ database: Database) -> AnyPublisher<Database.Change, Never> {
+  public static func objectsDidChange(_ database: Database) -> AnyPublisher<Database.Change, Never> {
     [self].objectsDidChange(database)
   }
 
   /// Observes count changes to this entity type
-  static func objectsCountChanged(_ database: Database) -> AnyPublisher<Database.Change, Never> {
+  public static func objectsCountChanged(_ database: Database) -> AnyPublisher<Database.Change, Never> {
     [self].objectsCountChanged(database)
   }
 }
 
 // MARK: - Collection Extensions
 
-public extension Collection where Element == NSManagedObject.Type {
+extension Collection where Element == NSManagedObject.Type {
   /// Observes changes to multiple entity types
-  func objectsDidChange(_ database: Database) -> AnyPublisher<Database.Change, Never> {
+  public func objectsDidChange(_ database: Database) -> AnyPublisher<Database.Change, Never> {
     database.objectsDidChange
       .filter { change in
         contains { item in
@@ -305,7 +320,7 @@ public extension Collection where Element == NSManagedObject.Type {
   }
 
   /// Observes count changes to multiple entity types
-  func objectsCountChanged(_ database: Database) -> AnyPublisher<Database.Change, Never> {
+  public func objectsCountChanged(_ database: Database) -> AnyPublisher<Database.Change, Never> {
     database.objectsDidChange
       .filter { $0.deleted.count > 0 || $0.inserted.count > 0 }
       .eraseToAnyPublisher()

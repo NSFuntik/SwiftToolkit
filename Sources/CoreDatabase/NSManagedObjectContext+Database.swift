@@ -4,13 +4,13 @@
 //
 //  Provides extensions for NSManagedObjectContext with enhanced functionality.
 
-import os.log
 import CoreData
 import Foundation
+import os.log
 
-public extension NSManagedObjectContext {
+extension NSManagedObjectContext {
   /// Indicates if this is the main view context
-  var isViewContext: Bool {
+  public var isViewContext: Bool {
     name == "view"
   }
 
@@ -18,10 +18,11 @@ public extension NSManagedObjectContext {
   /// - Parameter request: Fetch request to execute
   /// - Returns: Array of fetched objects
   /// - Throws: Core Data fetch errors
-  func execute<T: NSManagedObject>(request: NSFetchRequest<T>) throws -> [T] {
+  public func execute<T: NSManagedObject>(request: NSFetchRequest<T>) throws -> [T] {
     request.entity = NSEntityDescription.entity(
       forEntityName: String(describing: T.self),
-      in: self)!
+      in: self
+    )!
     return try fetch(request)
   }
 
@@ -38,15 +39,17 @@ public extension NSManagedObjectContext {
         self,
         &Self.ignoreMergeKey,
         newValue,
-        .OBJC_ASSOCIATION_RETAIN)
+        .OBJC_ASSOCIATION_RETAIN
+      )
     }
   }
 
   /// Saves changes in the current context and its parent
-  func saveAll() {
+  public func saveAll() {
     precondition(
       concurrencyType != .mainQueueConcurrencyType,
-      "View context cannot be saved")
+      "View context cannot be saved"
+    )
 
     guard hasChanges else { return }
 
@@ -68,7 +71,8 @@ public extension NSManagedObjectContext {
                 log: .default,
                 type: .error,
                 error.localizedDescription,
-                (error as NSError).userInfo)
+                (error as NSError).userInfo
+              )
             }
           }
         }
@@ -78,7 +82,8 @@ public extension NSManagedObjectContext {
           log: .default,
           type: .error,
           error.localizedDescription,
-          (error as NSError).userInfo)
+          (error as NSError).userInfo
+        )
       }
     }
   }

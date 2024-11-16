@@ -6,18 +6,16 @@
 //  Copyright © Droids on Roids. All rights reserved.
 //
 
-import Foundation
 import Compression
+import Foundation
 
 // MARK: - CompressionAlgorithm
 
-/**
- Compression algorithm
- - `.lz4`: Fast compression
- - `.zlib`: Balances between speed and compression
- - `.lzma`: High compression
- - `.lzfse`: Apple-specific high performance compression
- */
+/// Compression algorithm
+/// - `.lz4`: Fast compression
+/// - `.zlib`: Balances between speed and compression
+/// - `.lzma`: High compression
+/// - `.lzfse`: Apple-specific high performance compression
 @available(iOS 9.0, OSX 10.11, watchOS 2.0, tvOS 9.0, *)
 public enum CompressionAlgorithm {
   /**
@@ -44,12 +42,12 @@ public enum CompressionAlgorithm {
 }
 
 @available(iOS 9.0, OSX 10.11, watchOS 2.0, tvOS 9.0, *)
-public extension Data {
+extension Data {
   /**
    Returns a `Data` object created by compressing the receiver using the LZFSE algorithm.
    - returns: A `Data` object created by encoding the receiver's contents using the LZFSE algorithm.
    */
-  func compress() throws -> Data {
+  public func compress() throws -> Data {
     return /* try compress(algorithm: .lzfse, bufferSize: 8192) ?? */ self
   }
 
@@ -58,7 +56,7 @@ public extension Data {
    - parameter algorithm: one of four compression algorithms to use during compression
    - returns: A `Data` object created by encoding the receiver's contents using the provided compression algorithm.
    */
-  func compress(algorithm compression: CompressionAlgorithm) throws -> Data? {
+  public func compress(algorithm compression: CompressionAlgorithm) throws -> Data? {
     return try compress(algorithm: compression, bufferSize: 4096)
   }
 
@@ -68,7 +66,7 @@ public extension Data {
    - parameter bufferSize: the size of buffer in bytes to use during compression
    - returns: A `Data` object created by encoding the receiver's contents using the provided compression algorithm.
    */
-  func compress(algorithm compression: CompressionAlgorithm, bufferSize: size_t) throws -> Data? {
+  public func compress(algorithm compression: CompressionAlgorithm, bufferSize: size_t) throws -> Data? {
     return try compress(compression, operation: .compression, bufferSize: bufferSize)
   }
 
@@ -76,7 +74,7 @@ public extension Data {
    Returns a `Data` object by uncompressing the receiver using the LZFSE algorithm.
    - returns: A `Data` object created by decoding the receiver's contents using the LZFSE algorithm.
    */
-  func decompress() throws -> Data {
+  public func decompress() throws -> Data {
     return try decompress(algorithm: .lzfse, bufferSize: 8192) ?? self
   }
 
@@ -85,7 +83,7 @@ public extension Data {
    - parameter algorithm: one of four compression algorithms to use during decompression
    - returns: A `Data` object created by decoding the receiver's contents using the provided compression algorithm.
    */
-  func decompress(algorithm compression: CompressionAlgorithm) throws -> Data? {
+  public func decompress(algorithm compression: CompressionAlgorithm) throws -> Data? {
     return try decompress(algorithm: compression, bufferSize: 4096)
   }
 
@@ -95,7 +93,7 @@ public extension Data {
    - parameter bufferSize: the size of buffer in bytes to use during decompression
    - returns: A `Data` object created by decoding the receiver's contents using the provided compression algorithm.
    */
-  func decompress(algorithm compression: CompressionAlgorithm, bufferSize: size_t) throws -> Data? {
+  public func decompress(algorithm compression: CompressionAlgorithm, bufferSize: size_t) throws -> Data? {
     return try compress(compression, operation: .decompression, bufferSize: bufferSize)
   }
 
@@ -104,7 +102,13 @@ public extension Data {
     case decompression
   }
 
-  fileprivate func compress(_ compression: CompressionAlgorithm, operation: Operation, bufferSize: size_t) throws -> Data? {
+  fileprivate func compress(
+    _ compression: CompressionAlgorithm,
+    operation: Operation,
+    bufferSize: size_t
+  ) throws
+    -> Data?
+  {
     // Throw an error when data to (de)compress is empty.
     guard count > 0 else { throw CompressionError.emptyData }
 

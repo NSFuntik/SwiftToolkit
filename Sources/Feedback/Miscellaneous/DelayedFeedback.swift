@@ -1,9 +1,9 @@
 import SwiftUI
 
-public extension AnyFeedback {
+extension AnyFeedback {
   /// Defines a delay before the next feedback is performed
   /// - Parameter delay: The duration of the delay
-  func delay(_ delay: Double) -> Self {
+  public func delay(_ delay: Double) -> Self {
     .init(DelayedFeedback(duration: delay, haptic: self))
   }
 }

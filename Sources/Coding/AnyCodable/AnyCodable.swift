@@ -2,19 +2,17 @@ import Foundation
 
 // MARK: - AnyCodable
 
-/**
- A type-erased `Codable` value.
-
- The `AnyCodable` type forwards encoding and decoding responsibilities
- to an underlying value, hiding its specific underlying type.
-
- You can encode or decode mixed-type values in dictionaries
- and other collections that require `Encodable` or `Decodable` conformance
- by declaring their contained type to be `AnyCodable`.
-
- - SeeAlso: `AnyEncodable`
- - SeeAlso: `AnyDecodable`
- */
+/// A type-erased `Codable` value.
+///
+/// The `AnyCodable` type forwards encoding and decoding responsibilities
+/// to an underlying value, hiding its specific underlying type.
+///
+/// You can encode or decode mixed-type values in dictionaries
+/// and other collections that require `Encodable` or `Decodable` conformance
+/// by declaring their contained type to be `AnyCodable`.
+///
+/// - SeeAlso: `AnyEncodable`
+/// - SeeAlso: `AnyDecodable`
 @frozen public struct AnyCodable: @unchecked Sendable, Codable {
   public let value: Any
 
@@ -23,16 +21,16 @@ import Foundation
   }
 }
 
-public extension Encodable {
+extension Encodable {
   /// Encode into JSON and return `Data`
-  func jsonData() throws -> Data {
+  public func jsonData() throws -> Data {
     let encoder = JSONEncoder()
     encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes, .prettyPrinted]
     encoder.dateEncodingStrategy = .iso8601
     return try encoder.encode(self)
   }
 
-  var prettyPrintedJSONString: String {
+  public var prettyPrintedJSONString: String {
     let encoder = JSONEncoder()
     encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes, .prettyPrinted]
     encoder.dateEncodingStrategy = .iso8601

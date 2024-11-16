@@ -10,7 +10,11 @@ import SwiftUI
 // MARK: - SocialIcons
 
 public enum SocialIcons: RawRepresentable, CaseIterable {
-  public static let allCases: [SocialIcons] = [.etsy, .facebook, .facebookMessenger, .github, .google, .imo, .instagram, .apple, .discord, .linkedin, .medium, .notion, .paypal, .pinterest, .reddit, .signal, .skype, .snapchat, .telegram, .tikTok, .twitch, .twitter, .venmo, .wechat, .whatsApp, .youTube, .viber, .vk, .odnoklassniki, .email, .voicer]
+  public static let allCases: [SocialIcons] = [
+    .etsy, .facebook, .facebookMessenger, .github, .google, .imo, .instagram, .apple, .discord, .linkedin, .medium,
+    .notion, .paypal, .pinterest, .reddit, .signal, .skype, .snapchat, .telegram, .tikTok, .twitch, .twitter, .venmo,
+    .wechat, .whatsApp, .youTube, .viber, .vk, .odnoklassniki, .email, .voicer,
+  ]
   case unknown(String)
 
   case etsy
@@ -120,13 +124,20 @@ public enum SocialIcons: RawRepresentable, CaseIterable {
   }
 
   public init(rawValue: String) {
-    self = Self.allCases.sorted(by: { Self.levenshteinDistanceScore(from: $0.rawValue, to: rawValue) > Self.levenshteinDistanceScore(from: $1.rawValue, to: rawValue) }).first ?? .unknown(rawValue)
+    self =
+      Self.allCases.sorted(by: {
+        Self.levenshteinDistanceScore(from: $0.rawValue, to: rawValue)
+          > Self.levenshteinDistanceScore(from: $1.rawValue, to: rawValue)
+      }).first ?? .unknown(rawValue)
   }
 
   public init(from decoder: any Decoder) throws {
     let container = try decoder.singleValueContainer()
     let typeStr = try container.decode(String.self)
-    self = SocialIcons(rawValue: typeStr) /* .allCases.first(where: { $0.rawValue.contains(typeStr, caseSensitive: true) }) */ // , ChatClientError.failedToLoadAppSettings(url: typeStr))
+    self = SocialIcons(
+      rawValue: typeStr
+    ) /* .allCases.first(where: { $0.rawValue.contains(typeStr, caseSensitive: true) }) */
+    // , ChatClientError.failedToLoadAppSettings(url: typeStr))
   }
 
   public static func == (lhs: SocialIcons, rhs: SocialIcons) -> Bool {
@@ -145,7 +156,8 @@ public enum SocialIcons: RawRepresentable, CaseIterable {
     from: String,
     to string: String,
     caseSensitive: Bool = false,
-    trimWhiteSpacesAndNewLines: Bool = true) -> Double {
+    trimWhiteSpacesAndNewLines: Bool = true
+  ) -> Double {
     var firstString = from
     var secondString = string
 
@@ -159,7 +171,7 @@ public enum SocialIcons: RawRepresentable, CaseIterable {
     }
 
     let empty = [Int](repeating: 0, count: secondString.count)
-    var last = [Int](0 ... secondString.count)
+    var last = [Int](0...secondString.count)
 
     for (i, tLett) in firstString.enumerated() {
       var cur = [i + 1] + empty
@@ -179,10 +191,6 @@ public enum SocialIcons: RawRepresentable, CaseIterable {
     return 0.0
   }
 }
-
-import SwiftUI
-
-// MARK: - Ve
 
 struct Ve: View {
   var body: some View {
@@ -280,10 +288,6 @@ struct Ue: View {
   }
 }
 
-import SwiftUI
-
-// MARK: - Se
-
 struct Se: View {
   var body: some View {
     ZStack {
@@ -314,10 +318,6 @@ struct Se: View {
   }
 }
 
-import SwiftUI
-
-// MARK: - qe
-
 struct qe: View {
   var body: some View {
     ZStack {
@@ -346,10 +346,6 @@ struct qe: View {
     .frame(width: 24, height: 24)
   }
 }
-
-import SwiftUI
-
-// MARK: - Ye
 
 struct Ye: View {
   var body: some View {
@@ -396,10 +392,6 @@ struct Ye: View {
   }
 }
 
-import SwiftUI
-
-// MARK: - Ge
-
 struct Ge: View {
   var body: some View {
     ZStack {
@@ -410,9 +402,17 @@ struct Ge: View {
 
       Path { path in
         path.move(to: CGPoint(x: 7.47, y: 21.49))
-        path.addCurve(to: CGPoint(x: 1.86, y: 13), control1: CGPoint(x: 4.2, y: 19.93), control2: CGPoint(x: 1.86, y: 16.76))
+        path.addCurve(
+          to: CGPoint(x: 1.86, y: 13),
+          control1: CGPoint(x: 4.2, y: 19.93),
+          control2: CGPoint(x: 1.86, y: 16.76)
+        )
         path.addLine(to: CGPoint(x: 0, y: 13))
-        path.addCurve(to: CGPoint(x: 11.95, y: 24), control1: CGPoint(x: 5.66, y: 13), control2: CGPoint(x: 11.95, y: 24))
+        path.addCurve(
+          to: CGPoint(x: 11.95, y: 24),
+          control1: CGPoint(x: 5.66, y: 13),
+          control2: CGPoint(x: 11.95, y: 24)
+        )
         path.addLine(to: CGPoint(x: 12.61, y: 23.97))
         path.addLine(to: CGPoint(x: 8.8, y: 20.15))
         path.addLine(to: CGPoint(x: 7.47, y: 21.49))
@@ -421,9 +421,17 @@ struct Ge: View {
         path.addLine(to: CGPoint(x: 11.39, y: 0.04))
         path.addLine(to: CGPoint(x: 15.2, y: 3.85))
         path.addLine(to: CGPoint(x: 16.53, y: 2.52))
-        path.addCurve(to: CGPoint(x: 22.5, y: 11), control1: CGPoint(x: 19.8, y: 4.07), control2: CGPoint(x: 22.14, y: 7.24))
+        path.addCurve(
+          to: CGPoint(x: 22.5, y: 11),
+          control1: CGPoint(x: 19.8, y: 4.07),
+          control2: CGPoint(x: 22.14, y: 7.24)
+        )
         path.addLine(to: CGPoint(x: 24, y: 11))
-        path.addCurve(to: CGPoint(x: 11.95, y: 0), control1: CGPoint(x: 18.34, y: 11), control2: CGPoint(x: 11.95, y: 0))
+        path.addCurve(
+          to: CGPoint(x: 11.95, y: 0),
+          control1: CGPoint(x: 18.34, y: 11),
+          control2: CGPoint(x: 11.95, y: 0)
+        )
 
         path.move(to: CGPoint(x: 16, y: 14))
         path.addLine(to: CGPoint(x: 18, y: 14))

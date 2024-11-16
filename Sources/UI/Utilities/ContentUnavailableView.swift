@@ -1,32 +1,35 @@
 import Core
 import Photos
-import SwiftUI
 @_exported import SFSymbols
+import SwiftUI
 
 let cameraUnavailable =
   ContentUnavailableView(
     "Camera not avaible",
-    message: "Camera not avaible. Please go to Settings > \(String(describing: Bundle.main.infoDictionary?["CFBundleName"])) > Camera",
+    message:
+      "Camera not avaible. Please go to Settings > \(String(describing: Bundle.main.infoDictionary?["CFBundleName"])) > Camera",
     image: SFSymbol.questionmarkVideo.image,
     action: {
       PHPhotoLibrary.requestAuthorization { status in
         if status == .authorized {
           DispatchQueue.main.async {
             #if canImport(UIKit)
-              UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
+            UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
             #endif
           }
         }
       }
-    }, content: {
+    },
+    content: {
       EmptyView()
-    })
+    }
+  )
 
 #Preview(body: {
   cameraUnavailable
 })
 
-public extension ContentUnavailableView where Content == EmptyView {
+extension ContentUnavailableView where Content == EmptyView {
   /// Initializes a `ContentUnavailableView` with a title, subheadline, and a symbol.
   ///
   /// This initializer sets up the view to display a title text, a subheadline text,
@@ -41,13 +44,14 @@ public extension ContentUnavailableView where Content == EmptyView {
   ///   - actionTitle: The title for the button action, default is "Retry".
   ///   - actionSymbol: The symbol for the action button, default is `.arrowClockwise`.
   ///   - action: A closure to be executed when the action button is tapped.
-  init(
+  public init(
     _ title: String,
     subheadline: String,
     symbol: SFSymbol,
     actionTitle: String = "Retry",
     actionSymbol: SFSymbol = .arrowClockwise,
-    action: (() -> Void)? = nil) where Content == EmptyView {
+    action: (() -> Void)? = nil
+  ) where Content == EmptyView {
     self.title = title
     self.message = subheadline
     self.image = symbol.image
@@ -70,13 +74,14 @@ public extension ContentUnavailableView where Content == EmptyView {
   ///   - actionTitle: The title for the button action, default is "Retry".
   ///   - actionSymbol: The symbol for the action button, default is `.arrowClockwise`.
   ///   - action: A closure to be executed when the action button is tapped.
-  init(
+  public init(
     _ title: String,
     subheadline: String,
     image: Image,
     actionTitle: String = "Retry",
     actionSymbol: SFSymbol = .arrowClockwise,
-    action: (() -> Void)? = nil) where Content == EmptyView {
+    action: (() -> Void)? = nil
+  ) where Content == EmptyView {
     self.title = title
     self.message = subheadline
     self.image = image
@@ -121,7 +126,8 @@ public struct ContentUnavailableView<Content>: View where Content: View {
     actionTitle: String = "Retry",
     actionSymbol: SFSymbol = .arrowClockwise,
     action: (() -> Void)? = nil,
-    @ViewBuilder content: @escaping () -> Content) {
+    @ViewBuilder content: @escaping () -> Content
+  ) {
     self.title = title
     self.message = message
     self.image = image
@@ -150,7 +156,8 @@ public struct ContentUnavailableView<Content>: View where Content: View {
     actionTitle: String = "Retry",
     actionSymbol: SFSymbol = .arrowClockwise,
     action: (() -> Void)? = nil,
-    @ViewBuilder content: @escaping () -> Content) {
+    @ViewBuilder content: @escaping () -> Content
+  ) {
     self.title = title
     self.message = ""
     self.image = image.image
@@ -166,7 +173,8 @@ public struct ContentUnavailableView<Content>: View where Content: View {
     actionTitle: String = "Retry",
     actionSymbol: SFSymbol = .arrowClockwise,
     action: (() -> Void)? = nil,
-    @ViewBuilder content: @escaping () -> Content) {
+    @ViewBuilder content: @escaping () -> Content
+  ) {
     self.title = title
     self.message = ""
     self.image = Image(systemName: symbol)
@@ -183,7 +191,8 @@ public struct ContentUnavailableView<Content>: View where Content: View {
     actionTitle: String = "Retry",
     actionSymbol _: SFSymbol = .arrowClockwise,
     action: (() -> Void)? = nil,
-    @ViewBuilder content: @escaping () -> Content) {
+    @ViewBuilder content: @escaping () -> Content
+  ) {
     self.title = title
     self.message = description
     self.image = symbol.image
@@ -232,8 +241,10 @@ public struct ContentUnavailableView<Content>: View where Content: View {
   ContentUnavailableView<Image>(
     "No Results",
     symbol: SFSymbol.battery100BoltRtl,
-    description: "Content Unavailable View Decription \n In this implementation, the ContentUnavailableView is a generic view that takes a Content view as a trailing closure. It displays a title, message, and an image, along with the provided content view.",
+    description:
+      "Content Unavailable View Decription \n In this implementation, the ContentUnavailableView is a generic view that takes a Content view as a trailing closure. It displays a title, message, and an image, along with the provided content view.",
     content: {
       SFSymbol.magnifyingglass.image
-    })
+    }
+  )
 })

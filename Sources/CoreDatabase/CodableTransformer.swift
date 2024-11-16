@@ -4,8 +4,8 @@
 //
 //  Provides a robust ValueTransformer for encoding and decoding complex Codable objects.
 
-import os.log
 import Foundation
+import os.log
 
 // MARK: - CodableTransformer
 
@@ -43,12 +43,15 @@ public final class CodableTransformer: ValueTransformer {
         }
         self = .codableObject(
           base64: base64Data,
-          name: NSStringFromClass(type(of: encodableObject)))
+          name: NSStringFromClass(type(of: encodableObject))
+        )
       case let dictionary as [String: Any]:
-        self = .dictionary(dictionary.reduce(into: [:]) { result, item in
-          guard let value = Value(value: item.value) else { return }
-          result[item.key] = value
-        })
+        self = .dictionary(
+          dictionary.reduce(into: [:]) { result, item in
+            guard let value = Value(value: item.value) else { return }
+            result[item.key] = value
+          }
+        )
       default:
         return nil
       }
@@ -75,7 +78,8 @@ public final class CodableTransformer: ValueTransformer {
         }
       case let .codableObject(base64, className):
         guard let data = Data(base64Encoded: base64),
-              let classObject = NSClassFromString(className) as? Decodable.Type else {
+          let classObject = NSClassFromString(className) as? Decodable.Type
+        else {
           throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Invalid codable object"))
         }
         return try classObject.decode(data)
@@ -102,7 +106,8 @@ public final class CodableTransformer: ValueTransformer {
   /// Transforms a value into its Data representation
   override public func transformedValue(_ value: Any?) -> Any? {
     guard let value = value,
-          let encodingValue = Value(value: value) else {
+      let encodingValue = Value(value: value)
+    else {
       return nil
     }
 
@@ -117,26 +122,26 @@ public final class CodableTransformer: ValueTransformer {
 
 // MARK: - Private Extensions
 
-private extension Encodable {
+extension Encodable {
   /// Converts an Encodable object to Data with ISO8601 date encoding
   /// - Parameter encoder: Custom JSONEncoder (optional)
   /// - Returns: Encoded data
   /// - Throws: Encoding errors
-  func toData(_ encoder: JSONEncoder = JSONEncoder()) throws -> Data {
+  fileprivate func toData(_ encoder: JSONEncoder = JSONEncoder()) throws -> Data {
     let configuredEncoder = encoder
     configuredEncoder.dateEncodingStrategy = .iso8601
     return try configuredEncoder.encode(self)
   }
 }
 
-private extension Decodable {
+extension Decodable {
   /// Decodes Data to a specific Decodable type with ISO8601 date decoding
   /// - Parameters:
   ///   - data: Data to decode
   ///   - decoder: Custom JSONDecoder (optional)
   /// - Returns: Decoded object
   /// - Throws: Decoding errors
-  static func decode(_ data: Data, decoder: JSONDecoder = JSONDecoder()) throws -> Self {
+  fileprivate static func decode(_ data: Data, decoder: JSONDecoder = JSONDecoder()) throws -> Self {
     let configuredDecoder = decoder
     configuredDecoder.dateDecodingStrategy = .iso8601
     return try configuredDecoder.decode(Self.self, from: data)
@@ -146,7 +151,7 @@ private extension Decodable {
   /// - Parameter dict: Dictionary to decode
   /// - Returns: Decoded object
   /// - Throws: Decoding errors
-  static func decode(_ dict: [String: Any]) throws -> Self {
+  fileprivate static func decode(_ dict: [String: Any]) throws -> Self {
     let data = try JSONSerialization.data(withJSONObject: dict, options: [])
     return try decode(data)
   }

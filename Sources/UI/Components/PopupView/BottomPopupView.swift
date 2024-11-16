@@ -5,57 +5,60 @@
 //  Created by NSFuntik on 05.09.2024.
 //
 import SwiftUI
+
 #if canImport(UIKit)
-  import UIKit
+import UIKit
 #elseif canImport(AppKit)
-  import AppKit
+import AppKit
 #endif
 
 // MARK: - Preview Provider
 
 #if DEBUG
-  struct PopupView_Previews: PreviewProvider {
-    static var previews: some View {
-      PreviewContent()
-    }
+struct PopupView_Previews: PreviewProvider {
+  static var previews: some View {
+    PreviewContent()
+  }
 
-    private struct PreviewContent: View {
-      @State private var isPresented = false
+  private struct PreviewContent: View {
+    @State private var isPresented = false
 
-      var body: some View {
-        VStack {
-          Spacer()
-          Text("Hello, World!")
-          Button("Show PopUp") {
-            isPresented = true
+    var body: some View {
+      VStack {
+        Spacer()
+        Text("Hello, World!")
+        Button("Show PopUp") {
+          isPresented = true
+        }
+        Spacer()
+      }
+      .popup(
+        isPresented: $isPresented,
+        blurRadius: 3,
+        blurAnimation: .interpolatingSpring
+      ) {
+        ContentUnavailableView(
+          "PopUp",
+          subheadline: "PopUp Content",
+          image: .init(sf: .listBullet),
+          actionTitle: "Hide PopUp",
+          action: {
+            isPresented = false
+
           }
-          Spacer()
-        }
-        .popup(
-          isPresented: $isPresented,
-          blurRadius: 3,
-          blurAnimation: .interpolatingSpring) {
-            ContentUnavailableView(
-              "PopUp",
-              subheadline: "PopUp Content",
-              image: .init(sf: .listBullet),
-              actionTitle: "Hide PopUp",
-              action: {
-                isPresented = false
+        )
+        .frame(maxWidth: .infinity)
+        .frame(height: 300)
+        #if os(macOS)
+        .background(Color(.selectedContentBackgroundColor))
 
-              })
-              .frame(maxWidth: .infinity)
-              .frame(height: 300)
-            #if os(macOS)
-              .background(Color(.selectedContentBackgroundColor))
-
-            #else
-              .background(Color(.systemBackground))
-            #endif
-        }
+        #else
+        .background(Color(.systemBackground))
+        #endif
       }
     }
   }
+}
 #endif
 
 // MARK: - BottomPopupView
@@ -82,12 +85,12 @@ public struct BottomPopupView<Content: View>: View {
         Spacer()
         content
           .padding(.bottom, geometry.safeAreaInsets.bottom)
-        #if os(macOS)
-          .background(Color(.selectedContentBackgroundColor))
+          #if os(macOS)
+        .background(Color(.selectedContentBackgroundColor))
 
-        #else
-          .background(Color(.systemBackground))
-        #endif
+          #else
+        .background(Color(.systemBackground))
+          #endif
           .clipShape(
             RoundedCornersShape(radius: 16, corners: [.topLeft, .topRight])
           )
@@ -135,7 +138,8 @@ struct RoundedCornersShape: Shape {
         radius: radius,
         startAngle: Angle(degrees: -90),
         endAngle: Angle(degrees: 0),
-        clockwise: false)
+        clockwise: false
+      )
     }
 
     // Right edge and bottom right corner
@@ -146,7 +150,8 @@ struct RoundedCornersShape: Shape {
         radius: radius,
         startAngle: Angle(degrees: 0),
         endAngle: Angle(degrees: 90),
-        clockwise: false)
+        clockwise: false
+      )
     }
 
     // Bottom edge and bottom left corner
@@ -157,7 +162,8 @@ struct RoundedCornersShape: Shape {
         radius: radius,
         startAngle: Angle(degrees: 90),
         endAngle: Angle(degrees: 180),
-        clockwise: false)
+        clockwise: false
+      )
     }
 
     // Left edge and top left corner
@@ -168,7 +174,8 @@ struct RoundedCornersShape: Shape {
         radius: radius,
         startAngle: Angle(degrees: 180),
         endAngle: Angle(degrees: 270),
-        clockwise: false)
+        clockwise: false
+      )
     }
 
     path.closeSubpath()
@@ -214,7 +221,8 @@ public struct OverlayModifier<OverlayView: View>: ViewModifier {
   ///   - overlayView: A closure that returns the overlay view.
   public init(
     isPresented: Binding<Bool>,
-    @ViewBuilder overlayView: @escaping () -> OverlayView) {
+    @ViewBuilder overlayView: @escaping () -> OverlayView
+  ) {
     self._isPresented = isPresented
     self.overlayView = overlayView()
   }
@@ -230,12 +238,13 @@ public struct OverlayModifier<OverlayView: View>: ViewModifier {
 ///
 /// This extension allows any view to present a popup overlay with
 /// customizable blur effects and animations when a condition is met.
-public extension View {
-  func popup<OverlayView: View>(
+extension View {
+  public func popup<OverlayView: View>(
     isPresented: Binding<Bool>,
     blurRadius: CGFloat = 3,
     blurAnimation: Animation? = .linear,
-    @ViewBuilder overlayView: @escaping () -> OverlayView) -> some View {
+    @ViewBuilder overlayView: @escaping () -> OverlayView
+  ) -> some View {
     blur(radius: isPresented.wrappedValue ? blurRadius : 0)
       .animation(blurAnimation, value: isPresented.wrappedValue)
       .allowsHitTesting(!isPresented.wrappedValue)
@@ -247,7 +256,7 @@ public extension View {
 
 // MARK: - Platform Extensions
 
-//#if os(macOS)
+// #if os(macOS)
 //  public extension View {
 //    func ignoresSafeArea(_ regions: SafeAreaRegions = .all, edges: Edge.Set = .all) -> some View {
 //      self
@@ -258,4 +267,4 @@ public extension View {
 //    case all
 //    case container
 //  }
-//#endif
+// #endif

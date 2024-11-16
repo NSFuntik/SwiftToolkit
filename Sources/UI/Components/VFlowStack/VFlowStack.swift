@@ -14,10 +14,16 @@ public struct VFlowStack<Content: View>: View {
   ///   - alignment: The alignment affects the anchor point for each child relative to its parent container
   ///   - horizontal: The spacing to use along the horizontal axis, between each child
   ///   - vertical: The spacing to use along the vertical axis, between each line
-  public init(alignment: Alignment = .center, horizontal: CGFloat? = nil, vertical: CGFloat? = nil, @ViewBuilder _ content: () -> Content) {
+  public init(
+    alignment: Alignment = .center,
+    horizontal: CGFloat? = nil,
+    vertical: CGFloat? = nil,
+    @ViewBuilder _ content: () -> Content
+  ) {
     self.positioning = .init(
       horizontal: .init(alignment: alignment.horizontal, spacing: horizontal),
-      vertical: .init(alignment: alignment.vertical, spacing: vertical))
+      vertical: .init(alignment: alignment.vertical, spacing: vertical)
+    )
     self.content = content()
   }
 
@@ -59,10 +65,12 @@ public struct VFlowLayout: Layout {
       var sizes: [CGSize] = []
 
       var contentSize: CGSize {
-        let width = sizes
+        let width =
+          sizes
           .map { $0.width }
           .joined(spacing: spacing)
-        let height = sizes
+        let height =
+          sizes
           .reduce(0) { max($0, $1.height) }
         return CGSize(width: width, height: height)
       }
@@ -76,9 +84,11 @@ public struct VFlowLayout: Layout {
     var spacing: CGFloat
     var lines: [Line] = []
     var contentSize: CGSize {
-      let width = lines
+      let width =
+        lines
         .reduce(0) { max($0, $1.contentSize.width) }
-      let height = lines
+      let height =
+        lines
         .map { $0.contentSize.height }
         .joined(spacing: spacing)
       return CGSize(width: width, height: height)
@@ -113,7 +123,12 @@ public struct VFlowLayout: Layout {
     return cache.contentSize
   }
 
-  public func placeSubviews(in bounds: CGRect, proposal: SwiftUI.ProposedViewSize, subviews: Subviews, cache: inout Cache) {
+  public func placeSubviews(
+    in bounds: CGRect,
+    proposal: SwiftUI.ProposedViewSize,
+    subviews: Subviews,
+    cache: inout Cache
+  ) {
     var index = 0
     var minY: CGFloat = 0
 
@@ -142,7 +157,8 @@ public struct VFlowLayout: Layout {
           y = (line.contentSize.height - size.height) / 2
         }
 
-        let origin = bounds
+        let origin =
+          bounds
           .offsetBy(dx: minX, dy: minY + y)
           .origin
 
@@ -192,13 +208,14 @@ public struct VFlowPositioning {
   public init(alignment: Alignment, spacing: CGFloat? = nil) {
     self.init(
       horizontal: .init(alignment: alignment.horizontal, spacing: spacing),
-      vertical: .init(alignment: alignment.vertical, spacing: spacing))
+      vertical: .init(alignment: alignment.vertical, spacing: spacing)
+    )
   }
 }
 
 @available(iOS 16, tvOS 16, macOS 13, watchOS 9, *)
-public extension BidirectionalCollection where Element: BinaryFloatingPoint {
-  func joined(spacing: Element) -> Element {
+extension BidirectionalCollection where Element: BinaryFloatingPoint {
+  public func joined(spacing: Element) -> Element {
     let spaced = map { value in
       value + spacing
     }.reduce(0) { $0 + $1 }
@@ -223,7 +240,7 @@ struct FlowLayout_Previews: PreviewProvider {
       }
       .padding(4)
       #if os(iOS)
-        .background(.bar, in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+      .background(.bar, in: RoundedRectangle(cornerRadius: 13, style: .continuous))
       #endif
     }
     .padding()

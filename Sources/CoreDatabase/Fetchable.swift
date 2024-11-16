@@ -4,10 +4,10 @@
 //
 //  Provides protocols for fetching and updating managed objects with robust error handling.
 
-import os
 import Combine
 import CoreData
 import Foundation
+import os
 
 // MARK: - FetchableError
 
@@ -65,22 +65,22 @@ public protocol Fetchable {
 
 // MARK: - Fetchable Default Implementations
 
-public extension Fetchable where Id: Equatable {
+extension Fetchable where Id: Equatable {
   /// Default source validation - always returns true
-  static func validateSource(_ source: Source) throws -> Bool { true }
+  public static func validateSource(_ source: Source) throws -> Bool { true }
 }
 
-public extension Fetchable {
-  static func isValid(source: Source) -> Bool { true }
+extension Fetchable {
+  public static func isValid(source: Source) -> Bool { true }
 }
 
-public extension Fetchable {
-  static func isValid(uid: Id?) -> Bool { uid != nil }
+extension Fetchable {
+  public static func isValid(uid: Id?) -> Bool { uid != nil }
 }
 
-public extension Fetchable where Source == [String: Any], Id == String? {
+extension Fetchable where Source == [String: Any], Id == String? {
   /// Extracts String identifier from dictionary source
-  static func uid(from source: [String: Any]) -> String? {
+  public static func uid(from source: [String: Any]) -> String? {
     var uid = source["uid"] as? String ?? source["id"] as? String
 
     if uid == nil, let id = source["id"] as? Int64 {
@@ -92,17 +92,19 @@ public extension Fetchable where Source == [String: Any], Id == String? {
         "ID not found in source for type: %{public}@",
         log: .default,
         type: .error,
-        String(describing: self))
+        String(describing: self)
+      )
     }
     return uid
   }
 }
 
-public extension Fetchable where Source == [String: Any], Id == UUID? {
+extension Fetchable where Source == [String: Any], Id == UUID? {
   /// Extracts UUID identifier from dictionary source
-  static func uid(from source: [String: Any]) -> UUID? {
+  public static func uid(from source: [String: Any]) -> UUID? {
     if let uid = source["uid"] as? String ?? source["id"] as? String,
-       let uuid = UUID(uuidString: uid) {
+      let uuid = UUID(uuidString: uid)
+    {
       return uuid
     }
 
@@ -110,23 +112,25 @@ public extension Fetchable where Source == [String: Any], Id == UUID? {
       "UUID not found in source for type: %{public}@",
       log: .default,
       type: .error,
-      String(describing: self))
+      String(describing: self)
+    )
     return nil
   }
 }
 
 // MARK: - Fetchable Parsing Extensions
 
-public extension Fetchable {
+extension Fetchable {
   /// Parses optional values from dictionary
   /// - Parameters:
   ///   - dict: Source dictionary
   ///   - keys: Array of keypaths and corresponding source keys
   ///   - dateConverted: Optional date conversion closure
-  func parse(
+  public func parse(
     _ dict: [String: Any],
     _ keys: [(dbKey: ReferenceWritableKeyPath<Self, Date?>, serviceKey: String)],
-    dateConverted: ((String) -> (Date?))? = nil) {
+    dateConverted: ((String) -> (Date?))? = nil
+  ) {
     for key in keys {
       if let value = dict[key.serviceKey] {
         if let value = value as? Date {
@@ -144,9 +148,10 @@ public extension Fetchable {
   /// - Parameters:
   ///   - dict: Source dictionary
   ///   - keys: Array of keypaths and corresponding source keys
-  func parse<U>(
+  public func parse<U>(
     _ dict: [String: Any],
-    _ keys: [(dbKey: ReferenceWritableKeyPath<Self, U>, serviceKey: String)]) {
+    _ keys: [(dbKey: ReferenceWritableKeyPath<Self, U>, serviceKey: String)]
+  ) {
     for key in keys {
       guard let value = dict[key.serviceKey] else { continue }
 
@@ -155,7 +160,8 @@ public extension Fetchable {
       } else if let value = value as? String {
         parseStringValue(value, for: key.dbKey)
       } else if let dbKey = key.dbKey as? ReferenceWritableKeyPath<Self, Float>,
-                let value = value as? Double {
+        let value = value as? Double
+      {
         self[keyPath: dbKey] = Float(value)
       }
     }
@@ -175,7 +181,7 @@ public extension Fetchable {
 
 // MARK: - NSManagedObject Extensions
 
-public extension Fetchable where Self: NSManagedObject, Source == [String: Any] {
+extension Fetchable where Self: NSManagedObject, Source == [String: Any] {
   /// Parses array of source data into managed objects
   /// - Parameters:
   ///   - array: Array of source data
@@ -183,11 +189,12 @@ public extension Fetchable where Self: NSManagedObject, Source == [String: Any] 
   ///   - deleteOldItems: Whether to delete items not in source
   ///   - ctx: Managed object context
   /// - Returns: Array of updated managed objects
-  static func parse(
+  public static func parse(
     _ array: [Source]?,
     additional: ((Self, Source) -> Void)? = nil,
     deleteOldItems: Bool = false,
-    ctx: NSManagedObjectContext) -> [Self] {
+    ctx: NSManagedObjectContext
+  ) -> [Self] {
     guard let array = array else { return [] }
 
     var resultSet = Set<NSManagedObjectID>()
@@ -196,7 +203,8 @@ public extension Fetchable where Self: NSManagedObject, Source == [String: Any] 
 
     for source in array {
       if let object = findAndUpdate(source, ctx: ctx),
-         !resultSet.contains(object.objectID) {
+        !resultSet.contains(object.objectID)
+      {
         oldItems.remove(object)
         resultSet.insert(object.objectID)
         result.append(object)
@@ -213,7 +221,7 @@ public extension Fetchable where Self: NSManagedObject, Source == [String: Any] 
   ///   - uid: Unique identifier
   ///   - ctx: Managed object context
   /// - Returns: Found or created object
-  static func findOrCreatePlaceholder(uid: Id, ctx: NSManagedObjectContext) -> Self {
+  public static func findOrCreatePlaceholder(uid: Id, ctx: NSManagedObjectContext) -> Self {
     if let found = findFirst(.with("uid", uid), ctx: ctx) {
       return found
     }
@@ -227,11 +235,12 @@ public extension Fetchable where Self: NSManagedObject, Source == [String: Any] 
   ///   - source: Source data
   ///   - ctx: Managed object context
   /// - Returns: Updated object if successful
-  static func findAndUpdate(_ source: Source?, ctx: NSManagedObjectContext) -> Self? {
+  public static func findAndUpdate(_ source: Source?, ctx: NSManagedObjectContext) -> Self? {
     guard let source = source,
-          (try? validateSource(source)) == true,
-          let uid = try? uid(from: source),
-          isValid(uid: uid) else {
+      (try? validateSource(source)) == true,
+      let uid = try? uid(from: source),
+      isValid(uid: uid)
+    else {
       return nil
     }
 
@@ -243,15 +252,17 @@ public extension Fetchable where Self: NSManagedObject, Source == [String: Any] 
 
 // MARK: - Dictionary Source Extensions
 
-public extension Fetchable where Self: NSManagedObject, Source == [String: Any] {
+extension Fetchable where Self: NSManagedObject, Source == [String: Any] {
   /// Parses and updates a related object
-  func parse<T: Fetchable & NSManagedObject>(
+  public func parse<T: Fetchable & NSManagedObject>(
     _ dict: [String: Any],
     _ dbKey: ReferenceWritableKeyPath<Self, T?>,
     _ serviceKey: String,
-    deleteOldItem: Bool = false) where T.Source == [String: Any] {
+    deleteOldItem: Bool = false
+  ) where T.Source == [String: Any] {
     guard let value = dict[serviceKey],
-          let ctx = managedObjectContext else { return }
+      let ctx = managedObjectContext
+    else { return }
 
     let oldItem = self[keyPath: dbKey]
     let updated = T.findAndUpdate(value as? [String: Any], ctx: ctx)
@@ -263,15 +274,17 @@ public extension Fetchable where Self: NSManagedObject, Source == [String: Any] 
   }
 
   /// Parses and updates a set of related objects
-  func parse<T: Fetchable & NSManagedObject>(
+  public func parse<T: Fetchable & NSManagedObject>(
     _ type: T.Type,
     _ dict: [String: Any],
     _ dbKey: ReferenceWritableKeyPath<Self, NSSet?>,
     _ serviceKey: String,
     additional: ((T, [String: Any]) -> Void)? = nil,
-    deleteOldItems: Bool = false) where T.Source == [String: Any] {
+    deleteOldItems: Bool = false
+  ) where T.Source == [String: Any] {
     guard let value = dict[serviceKey],
-          let ctx = managedObjectContext else { return }
+      let ctx = managedObjectContext
+    else { return }
 
     let array: [[String: Any]] = {
       if let value = value as? [[String: Any]] {

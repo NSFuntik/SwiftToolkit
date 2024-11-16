@@ -40,10 +40,13 @@ public struct LUUID: Hashable, Equatable, CustomStringConvertible, Sendable {
   /// Custom initializer to convert from an integer
   public init(from value: UInt64) {
     var bytes = [UInt8](repeating: 0, count: 16)
-    for i in 0 ..< 8 {
+    for i in 0..<8 {
       bytes[15 - i] = UInt8((value >> (i * 8)) & 0xFF)
     }
-    self.uuid = (bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7], bytes[8], bytes[9], bytes[10], bytes[11], bytes[12], bytes[13], bytes[14], bytes[15])
+    self.uuid = (
+      bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7], bytes[8], bytes[9], bytes[10],
+      bytes[11], bytes[12], bytes[13], bytes[14], bytes[15]
+    )
   }
 
   // MARK: Public
@@ -60,7 +63,9 @@ public struct LUUID: Hashable, Equatable, CustomStringConvertible, Sendable {
 
   /// Returns a string created from the UUID, such as "e621e1f8-c36c-495a-93fc-0c247a3e6e5f"
   public var uuidString: String {
-    var bytes: uuid_string_t = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    var bytes: uuid_string_t = (
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    )
     return withUnsafePointer(to: self.uuid) {
       $0.withMemoryRebound(to: UInt8.self, capacity: 16) { val in
         withUnsafeMutablePointer(to: &bytes) {
@@ -84,22 +89,11 @@ public struct LUUID: Hashable, Equatable, CustomStringConvertible, Sendable {
   // Static Functions
 
   public static func == (lhs: LUUID, rhs: LUUID) -> Bool {
-    lhs.uuid.0 == rhs.uuid.0 &&
-      lhs.uuid.1 == rhs.uuid.1 &&
-      lhs.uuid.2 == rhs.uuid.2 &&
-      lhs.uuid.3 == rhs.uuid.3 &&
-      lhs.uuid.4 == rhs.uuid.4 &&
-      lhs.uuid.5 == rhs.uuid.5 &&
-      lhs.uuid.6 == rhs.uuid.6 &&
-      lhs.uuid.7 == rhs.uuid.7 &&
-      lhs.uuid.8 == rhs.uuid.8 &&
-      lhs.uuid.9 == rhs.uuid.9 &&
-      lhs.uuid.10 == rhs.uuid.10 &&
-      lhs.uuid.11 == rhs.uuid.11 &&
-      lhs.uuid.12 == rhs.uuid.12 &&
-      lhs.uuid.13 == rhs.uuid.13 &&
-      lhs.uuid.14 == rhs.uuid.14 &&
-      lhs.uuid.15 == rhs.uuid.15
+    lhs.uuid.0 == rhs.uuid.0 && lhs.uuid.1 == rhs.uuid.1 && lhs.uuid.2 == rhs.uuid.2 && lhs.uuid.3 == rhs.uuid.3
+      && lhs.uuid.4 == rhs.uuid.4 && lhs.uuid.5 == rhs.uuid.5 && lhs.uuid.6 == rhs.uuid.6 && lhs.uuid.7 == rhs.uuid.7
+      && lhs.uuid.8 == rhs.uuid.8 && lhs.uuid.9 == rhs.uuid.9 && lhs.uuid.10 == rhs.uuid.10
+      && lhs.uuid.11 == rhs.uuid.11 && lhs.uuid.12 == rhs.uuid.12 && lhs.uuid.13 == rhs.uuid.13
+      && lhs.uuid.14 == rhs.uuid.14 && lhs.uuid.15 == rhs.uuid.15
   }
 
   // Functions
@@ -141,7 +135,10 @@ extension LUUID: Codable {
       }
       self = uuid
     } else {
-      throw DecodingError.dataCorruptedError(in: container, debugDescription: "Unable to decode UUID from provided data.")
+      throw DecodingError.dataCorruptedError(
+        in: container,
+        debugDescription: "Unable to decode UUID from provided data."
+      )
     }
   }
 
@@ -151,14 +148,14 @@ extension LUUID: Codable {
   }
 }
 
-public extension LUUID {
+extension LUUID {
   /// Returns a new UUID with RFC 4122 version 4 random bytes
-  func isEmpty() -> Bool {
+  public func isEmpty() -> Bool {
     self == LUUID.null
   }
 
   /// Returns a new UUID with RFC 4122 version 4 random bytes
-  func nilIfEmpty() -> LUUID? {
+  public func nilIfEmpty() -> LUUID? {
     self.isEmpty() ? nil : self
   }
 }

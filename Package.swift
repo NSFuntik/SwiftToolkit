@@ -8,17 +8,17 @@ let package = Package(
     .macOS(.v12),
     .tvOS(.v15),
     .watchOS(.v8),
-    .macCatalyst(.v15),
+    .macCatalyst(.v15)
   ],
   products: [
     // Core modules
-    .library(name: "SwiftToolkitCore", targets: ["Core"]),
+    .library(name: "Core", targets: ["Core"]),
 
     // Feature modules
     .library(name: "UI", targets: ["UI"]),
     .library(name: "Coordinator", targets: ["Coordinator"]),
     .library(name: "Feedback", targets: ["Feedback"]),
-    .library(name: "SwiftToolkitCoding", targets: ["STCoding"]),
+    .library(name: "Coding", targets: ["Coding"]),
     .library(name: "DI", targets: ["DI"]),
     .library(name: "Logger", targets: ["Logger"]),
     .library(name: "SFSymbols", targets: ["SFSymbols"]),
@@ -28,7 +28,11 @@ let package = Package(
     .library(
       name: "SwiftToolkit",
       type: .dynamic,
-      targets: ["SwiftToolkit"]),
+      targets: ["SwiftToolkit"])
+  ],
+  dependencies: [
+    .package(
+      url: "https://github.com/SimplyDanny/SwiftLintPlugins", from: "0.57.0")
   ],
   targets: [
     // Core targets
@@ -40,7 +44,7 @@ let package = Package(
     .target(name: "UI", dependencies: ["Core", "Feedback", "SFSymbols"]),
     .target(name: "Coordinator"),
     .target(name: "Feedback", dependencies: ["Core"]),
-    .target(name: "STCoding", dependencies: ["Core"]),
+    .target(name: "Coding", dependencies: ["Core"]),
     .target(name: "DI"),
     .target(name: "Logger", dependencies: ["Core"]),
     .target(name: "SFSymbols", dependencies: ["Core", "DI"]),
@@ -53,9 +57,14 @@ let package = Package(
         "Core",
         "UI",
         "Coordinator",
-        "STCoding",
+        "Coding",
         "DI",
         "Logger",
-        "CoreDatabase",
-      ]),
-  ])
+        "CoreDatabase"
+      ],
+      plugins: [
+        .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
+      ]
+    )
+  ]
+)

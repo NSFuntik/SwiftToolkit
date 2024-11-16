@@ -8,7 +8,8 @@ public struct LogEventView: View {
 
   public init(
     event: Event,
-    isMinimal: Bool = false) {
+    isMinimal: Bool = false
+  ) {
     self.event = event
     self.isMinimal = isMinimal
   }
@@ -18,15 +19,19 @@ public struct LogEventView: View {
       HStack {
         //                let date = Event.dateFormatter.string(from: event.dateCreated)
         //                let time = Event.timeFormatter.string(from: event.dateCreated)
-        VStack(alignment: .leading, spacing: 2, content: {
-          Text(event.dateCreated, style: .offset)
-            .font(.caption.weight(.regular).monospacedDigit())
+        VStack(
+          alignment: .leading,
+          spacing: 2,
+          content: {
+            Text(event.dateCreated, style: .offset)
+              .font(.caption.weight(.regular).monospacedDigit())
 
-          Text("\(event.level.emoji.symbolRenderingMode(.multicolor)) \u{25b8}: \(event.message)")
-            .font(.footnote.monospaced().weight(.light))
-            .lineLimit(nil)
-            .multilineTextAlignment(.leading)
-        })
+            Text("\(event.level.emoji.symbolRenderingMode(.multicolor)) \u{25b8}: \(event.message)")
+              .font(.footnote.monospaced().weight(.light))
+              .lineLimit(nil)
+              .multilineTextAlignment(.leading)
+          }
+        )
         .padding(.leading, 4)
         Spacer()
       }
@@ -37,8 +42,11 @@ public struct LogEventView: View {
     } else {
       VStack(alignment: .leading, spacing: 8) {
         HStack(spacing: 8) {
-          Label("\(event.metadata.file.description) \u{0040} **line: \(event.metadata.line)**", systemImage: "calendar.day.timeline.left")
-            .symbolRenderingMode(.multicolor).imageScale(.large)
+          Label(
+            "\(event.metadata.file.description) \u{0040} **line: \(event.metadata.line)**",
+            systemImage: "calendar.day.timeline.left"
+          )
+          .symbolRenderingMode(.multicolor).imageScale(.large)
           Spacer()
           Text(event.dateCreated.formatted(date: .abbreviated, time: .standard))
           if let error = event.error {
@@ -62,7 +70,8 @@ public struct LogEventView: View {
         })
         .padding(8)
         .background(
-          Rectangle().fill(event.level.color).opacity(0.0666)).padding(-8).padding(.horizontal, -3)
+          Rectangle().fill(event.level.color).opacity(0.0666)
+        ).padding(-8).padding(.horizontal, -3)
         if let error = event.error {
           Divider()
           Text("🚨" + error.localizedDescription)

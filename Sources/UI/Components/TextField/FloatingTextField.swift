@@ -36,7 +36,8 @@ public struct FloatingTextField: View {
     placeholderOffset offset: CGFloat = 0,
     scaleEffectValue scale: CGFloat = 1,
     colorPalette: (primary: Color, secondary: Color) = (.accentColor, .secondary),
-    onTextAction: ((_: String, _: String) -> Void)? = nil) {
+    onTextAction: ((_: String, _: String) -> Void)? = nil
+  ) {
     self.placeholderText = placeholderText
     self._placeholderOffset = State(initialValue: offset)
     self._scaleEffectValue = State(initialValue: scale)
@@ -74,12 +75,12 @@ public struct FloatingTextField: View {
 }
 
 /// Extension methods for `FloatingTextField`.
-public extension FloatingTextField {
+extension FloatingTextField {
   /// Adds a closure to be called when the text changes.
   ///
   /// - Parameter onTextAction: A closure that is called when the text changes, providing the old and new values.
   /// - Returns: The modified `FloatingTextField` instance.
-  func onTextChange(_ onTextAction: ((_ oldValue: String, _ newValue: String) -> Void)?) -> Self {
+  public func onTextChange(_ onTextAction: ((_ oldValue: String, _ newValue: String) -> Void)?) -> Self {
     var view = self
     view.onTextAction = onTextAction
     return view

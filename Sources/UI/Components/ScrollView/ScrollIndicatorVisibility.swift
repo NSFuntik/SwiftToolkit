@@ -1,4 +1,3 @@
-
 import SwiftUI
 
 /// The visibility of scroll indicators of a UI element.

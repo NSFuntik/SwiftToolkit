@@ -5,7 +5,6 @@
 //  Created by Dmitry Mikhailov on 29.10.2024.
 //
 
-
 // MARK: - Set + StorageCodable
 
 /// Extends the `Set` type to conform to `RawRepresentable` when its element is a `String`.

@@ -1,6 +1,6 @@
-import SwiftUI
-import Foundation
 @_exported import Combine
+import Foundation
+import SwiftUI
 
 // MARK: - DI
 
@@ -60,7 +60,8 @@ public enum DI {
     ///   - keyPath: The keypath to access the nested service within the container
     public init<ServiceContainer>(
       _ key: Key<ServiceContainer>,
-      _ keyPath: KeyPath<ServiceContainer, Service>) {
+      _ keyPath: KeyPath<ServiceContainer, Service>
+    ) {
       self.key = nil
       wrappedValue = Container.resolveObservable(key).observed[keyPath: keyPath]
     }
@@ -115,7 +116,8 @@ public enum DI {
     ///   - keyPath: The keypath to access the nested service within the container
     public init<ServiceContainer>(
       _ key: Key<ServiceContainer>,
-      _ keyPath: KeyPath<ServiceContainer, Service>) {
+      _ keyPath: KeyPath<ServiceContainer, Service>
+    ) {
       _wrapper = .init(wrappedValue: .init(Container.resolveObservable(key).observed[keyPath: keyPath]))
     }
 
@@ -139,7 +141,8 @@ public enum DI {
     public static subscript<T: ObservableObject>(
       _enclosingInstance instance: T,
       wrapped _: ReferenceWritableKeyPath<T, Service>,
-      storage storageKeyPath: ReferenceWritableKeyPath<T, RePublished>) -> Service {
+      storage storageKeyPath: ReferenceWritableKeyPath<T, RePublished>
+    ) -> Service {
       get {
         if instance[keyPath: storageKeyPath].observer == nil {
           instance[keyPath: storageKeyPath].setupObserver(instance)
@@ -150,9 +153,10 @@ public enum DI {
     }
 
     private func setupObserver<T: ObservableObject>(_ instance: T) {
-      observer = ((value as? any ObservableObject)?.sink { [weak instance] in
-        (instance?.objectWillChange as? any Publisher as? ObservableObjectPublisher)?.send()
-      })
+      observer =
+        ((value as? any ObservableObject)?.sink { [weak instance] in
+          (instance?.objectWillChange as? any Publisher as? ObservableObjectPublisher)?.send()
+        })
     }
 
     private var observer: AnyCancellable?
@@ -179,7 +183,8 @@ public enum DI {
     ///   - keyPath: The keypath to access the nested service within the container
     public init<ServiceContainer>(
       _ key: Key<ServiceContainer>,
-      _ keyPath: KeyPath<ServiceContainer, Service>) {
+      _ keyPath: KeyPath<ServiceContainer, Service>
+    ) {
       self.key = nil
       value = Container.resolveObservable(key).observed[keyPath: keyPath]
     }
@@ -216,8 +221,8 @@ public enum DI {
 ///     static let userManager = Key<any UserManager>()
 /// }
 /// ```
-public extension DI {
-  struct Key<Value>: Hashable, Sendable {
+extension DI {
+  public struct Key<Value>: Hashable, Sendable {
     private let id = UUID()
 
     /// Creates a new key instance for service identification
@@ -227,7 +232,7 @@ public extension DI {
   /// A *singleton* container for managing service instances with thread-safe access.
   /// The container supports registration and resolution of services, with automatic
   /// replacement of existing services when registering with the same key.
-  final class Container {
+  public final class Container {
     /// The singleton instance of the service container
     fileprivate static let current = Container()
 
@@ -247,7 +252,8 @@ public extension DI {
     ///   - make: A closure that produces the service instance
     public static func register<Service>(
       _ key: Key<Service>,
-      _ make: () -> Service) {
+      _ make: () -> Service
+    ) {
       let service = make()
       pthread_rwlock_wrlock(&current.lock)
       current.storage[key.hashValue] = ObservableObjectWrapper(service)
@@ -260,7 +266,8 @@ public extension DI {
     ///   - service: The service instance to register
     public static func register<Service>(
       _ key: Key<Service>,
-      _ service: Service) {
+      _ service: Service
+    ) {
       register(key) { service }
     }
 
@@ -315,11 +322,11 @@ public final class ObservableObjectWrapper<Value>: ObservableObject {
   }
 }
 
-private extension ObservableObject {
+extension ObservableObject {
   /// Helper function to subscribe to objectWillChange
   /// - Parameter closure: The closure to execute when the object changes
   /// - Returns: A cancellable subscription
-  func sink(_ closure: @escaping () -> Void) -> AnyCancellable {
+  fileprivate func sink(_ closure: @escaping () -> Void) -> AnyCancellable {
     objectWillChange.sink { _ in closure() }
   }
 }

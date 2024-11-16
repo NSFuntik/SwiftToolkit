@@ -86,10 +86,10 @@ public final class Navigation<C: Coordinator>: ObservableObject {
 @MainActor
 public protocol Coordinator: ObservableObject, Hashable, Sendable {}
 
-public extension Coordinator {
+extension Coordinator {
   /// Hashes the coordinator instance
   /// - Parameter hasher: The hasher to use for combining the instance's essential components
-  nonisolated func hash(into hasher: inout Hasher) {
+  public nonisolated func hash(into hasher: inout Hasher) {
     hasher.combine(ObjectIdentifier(self))
   }
 
@@ -98,31 +98,31 @@ public extension Coordinator {
   ///   - lhs: The first coordinator to compare
   ///   - rhs: The second coordinator to compare
   /// - Returns: true if the coordinators are equal
-  nonisolated static func == (lhs: Self, rhs: Self) -> Bool {
+  public nonisolated static func == (lhs: Self, rhs: Self) -> Bool {
     lhs.hashValue == rhs.hashValue
   }
 
   /// Dismisses the current modal navigation
   @MainActor
-  func dismiss() {
+  public func dismiss() {
     state.presentedBy?.dismissPresented()
   }
 
   /// Dismisses any modal navigation presented over the current navigation
   @MainActor
-  func dismissPresented() {
+  public func dismissPresented() {
     state.modalPresented = nil
   }
 
   /// Removes the topmost screen from the navigation stack
   @MainActor
-  func pop() {
+  public func pop() {
     state.path.removeLast()
   }
 
   /// Removes all screens from the navigation stack except the root
   @MainActor
-  func popToRoot() {
+  public func popToRoot() {
     state.path.removeAll()
   }
 }
@@ -135,8 +135,10 @@ extension Coordinator {
   /// - Parameters:
   ///   - presentation: The modal presentation configuration
   ///   - resolve: The resolution strategy for handling existing presentations
-  func present(_ presentation: ModalPresentation,
-               resolve: PresentationResolve = .overAll) {
+  func present(
+    _ presentation: ModalPresentation,
+    resolve: PresentationResolve = .overAll
+  ) {
     if let presentedCoordinator = state.modalPresented?.coordinator {
       switch resolve {
       case .replaceCurrent:
@@ -157,11 +159,11 @@ extension Coordinator {
 // MARK: - Constants and Protocols
 
 /// Commonly used coordinate spaces for navigation and modal views
-public extension CoordinateSpace {
+extension CoordinateSpace {
   /// Coordinate space for navigation controller views
-  static let navController = "CoordinatorSpaceNavigationController"
+  public static let navController = "CoordinatorSpaceNavigationController"
   /// Coordinate space for modal presentation views
-  static let modal = "CoordinatorSpaceModal"
+  public static let modal = "CoordinatorSpaceModal"
 }
 
 // MARK: - CustomCoordinator
@@ -174,22 +176,22 @@ public protocol CustomCoordinator: Coordinator {
   func destination() -> DestinationView
 }
 
-public extension CustomCoordinator {
+extension CustomCoordinator {
   /// The root view of the coordinator with modal presentation capability
   @MainActor
-  var rootView: some View {
+  public var rootView: some View {
     destination().withModal(self)
   }
 }
 
 // MARK: - View Modifiers
 
-public extension View {
+extension View {
   /// Adds navigation capabilities to a view
   /// - Parameter coordinator: The navigation coordinator
   /// - Returns: A view with navigation capabilities
   @MainActor
-  func withNavigation<C: NavigationCoordinator>(_ coordinator: C) -> some View {
+  public func withNavigation<C: NavigationCoordinator>(_ coordinator: C) -> some View {
     modifier(NavigationModifer(coordinator: coordinator))
   }
 }
@@ -210,11 +212,11 @@ public protocol NavigationCoordinator: Coordinator {
   @ViewBuilder func destination(for screen: Screen) -> ScreenView
 }
 
-public extension NavigationCoordinator {
+extension NavigationCoordinator {
   /// Presents a new screen in the navigation stack
   /// - Parameter screen: The screen to present
   @MainActor
-  func present(_ screen: Screen) {
+  public func present(_ screen: Screen) {
     state.path.append(screen)
   }
 
@@ -223,7 +225,7 @@ public extension NavigationCoordinator {
   /// - Returns: true if a matching screen was found and navigation was performed
   @MainActor
   @discardableResult
-  func popTo(where condition: (Screen) -> Bool) -> Bool {
+  public func popTo(where condition: (Screen) -> Bool) -> Bool {
     if let index = state.path.firstIndex(where: {
       if let screen = $0 as? Screen {
         return condition(screen)
@@ -241,17 +243,17 @@ public extension NavigationCoordinator {
   /// - Returns: true if the screen was found and navigation was performed
   @MainActor
   @discardableResult
-  func popTo(_ element: Screen) -> Bool {
+  public func popTo(_ element: Screen) -> Bool {
     popTo(where: { $0 == element })
   }
 }
 
-public extension NavigationCoordinator {
+extension NavigationCoordinator {
   /// Returns a view for the specified screen with navigation and modal capabilities
   /// - Parameter screen: The screen to create a view for
   /// - Returns: A view configured with navigation and modal presentation support
   @MainActor
-  func view(for screen: Screen) -> some View {
+  public func view(for screen: Screen) -> some View {
     destination(for: screen)
       .withNavigation(self)
       .withModal(self)
@@ -305,7 +307,8 @@ private struct NavigationModifer<Coordinator: NavigationCoordinator>: ViewModifi
                 if !isActive {
                   state.path.removeAll()
                 }
-              }),
+              }
+            ),
             destination: {
               if let lastScreen = state.path.last as? Coordinator.Screen {
                 coordinator.destination(for: lastScreen)
@@ -314,7 +317,8 @@ private struct NavigationModifer<Coordinator: NavigationCoordinator>: ViewModifi
                   )
               }
             },
-            label: { EmptyView() })
+            label: { EmptyView() }
+          )
         )
     }
     .navigationViewStyle(.automatic)
@@ -331,11 +335,13 @@ private struct NavigationModifer<Coordinator: NavigationCoordinator>: ViewModifi
               if !isActive {
                 state.path.removeSubrange((index + 1)...)
               }
-            }),
+            }
+          ),
           destination: {
             coordinator.destination(for: typedScreen)
           },
-          label: { EmptyView() })
+          label: { EmptyView() }
+        )
       }
     }
   }
@@ -372,9 +378,9 @@ public final class NavigationState: ObservableObject {
 
   @MainActor private func closeKeyboard() {
     #if os(macOS)
-      NSApp.keyWindow?.makeFirstResponder(nil)
+    NSApp.keyWindow?.makeFirstResponder(nil)
     #else
-      UIApplication.shared.resignFirstResponder()
+    UIApplication.shared.resignFirstResponder()
     #endif
   }
 }

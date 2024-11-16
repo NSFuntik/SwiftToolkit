@@ -11,9 +11,9 @@ import CoreData
 /// Protocol for objects that can provide their object ID
 public protocol WithObjectId {}
 
-public extension WithObjectId where Self: NSManagedObject {
+extension WithObjectId where Self: NSManagedObject {
   /// Gets a type-safe object identifier
-  var getObjectId: ObjectId<Self> {
+  public var getObjectId: ObjectId<Self> {
     ObjectId(self)
   }
 }
@@ -33,8 +33,8 @@ public struct ObjectId<T: NSManagedObject>: Hashable {
   public init(_ object: T) {
     if object.objectID.isTemporaryID {
       do {
-            try object.managedObjectContext?.obtainPermanentIDs(for: [object])
-        } catch {
+        try object.managedObjectContext?.obtainPermanentIDs(for: [object])
+      } catch {
         print("Warning: Could not obtain permanent object ID")
       }
     }
@@ -69,32 +69,32 @@ public struct ObjectId<T: NSManagedObject>: Hashable {
 
 // MARK: - Sequence Extensions
 
-public extension Sequence {
+extension Sequence {
   /// Retrieves objects from the view context
   /// - Parameter database: Database instance
   /// - Returns: Array of retrieved objects
   @MainActor
-  func objects<U: NSManagedObject>(_ database: Database) -> [U] where Element == ObjectId<U> {
+  public func objects<U: NSManagedObject>(_ database: Database) -> [U] where Element == ObjectId<U> {
     objects(database.viewContext)
   }
 
   /// Retrieves objects from a specific context
   /// - Parameter ctx: Managed object context
   /// - Returns: Array of retrieved objects
-  func objects<U: NSManagedObject>(_ ctx: NSManagedObjectContext) -> [U] where Element == ObjectId<U> {
+  public func objects<U: NSManagedObject>(_ ctx: NSManagedObjectContext) -> [U] where Element == ObjectId<U> {
     compactMap { $0.object(ctx) }
   }
 
   /// Gets URI representations of object IDs
   /// - Returns: Array of URIs
-  func uri<U: NSManagedObject>() -> [URL] where Element == ObjectId<U> {
+  public func uri<U: NSManagedObject>() -> [URL] where Element == ObjectId<U> {
     map { $0.objectId.uriRepresentation() }
   }
 }
 
-public extension Sequence where Element: NSManagedObject {
+extension Sequence where Element: NSManagedObject {
   /// Gets type-safe object IDs for a sequence of managed objects
-  var ids: [ObjectId<Element>] {
+  public var ids: [ObjectId<Element>] {
     map { $0.getObjectId }
   }
 }

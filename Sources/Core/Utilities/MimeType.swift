@@ -50,25 +50,30 @@ public enum MIMEType: Identifiable, CaseIterable, RawRepresentable {
     public var id: String {
       switch self {
       case .ear,
-           .jar,
-           .war: "java-archive"
+        .jar,
+        .war:
+        "java-archive"
       case .bin,
-           .deb,
-           .dll,
-           .dmg,
-           .exe,
-           .img,
-           .iso,
-           .msi,
-           .msm,
-           .msp: "octet-stream"
+        .deb,
+        .dll,
+        .dmg,
+        .exe,
+        .img,
+        .iso,
+        .msi,
+        .msm,
+        .msp:
+        "octet-stream"
       case .pl,
-           .pm: "x-perl"
+        .pm:
+        "x-perl"
       case .pdb,
-           .prc: "x-pilot"
+        .prc:
+        "x-pilot"
       case .crt,
-           .der,
-           .pem: "x-x509-ca-cert"
+        .der,
+        .pem:
+        "x-x509-ca-cert"
       case .ai: "postscript"
       case .atom: "atom+xml"
       case .cco: "x-cocoa"
@@ -118,7 +123,8 @@ public enum MIMEType: Identifiable, CaseIterable, RawRepresentable {
     public var id: String {
       switch self {
       case .midi,
-           .ogg: rawValue
+        .ogg:
+        rawValue
       case .kar: "midi"
       case .m4a: "x-m4a"
       case .mp3: "mpeg"
@@ -136,10 +142,11 @@ public enum MIMEType: Identifiable, CaseIterable, RawRepresentable {
     public var id: String {
       switch self {
       case .gif,
-           .jpeg,
-           .png,
-           .tiff,
-           .webp: rawValue
+        .jpeg,
+        .png,
+        .tiff,
+        .webp:
+        rawValue
       case .bmp: "x-ms-bmp"
       case .ico: "x-icon"
       case .jng: "x-jng"
@@ -157,11 +164,12 @@ public enum MIMEType: Identifiable, CaseIterable, RawRepresentable {
     public var id: String {
       switch self {
       case .css,
-           .csv,
-           .html,
-           .mathml,
-           .plain,
-           .xml: rawValue
+        .csv,
+        .html,
+        .mathml,
+        .plain,
+        .xml:
+        rawValue
       case .jad: "vnd.sun.j2me.app-descriptor"
       case .wml: "vnd.wap.wml"
       case .htc: "x-component"
@@ -177,7 +185,8 @@ public enum MIMEType: Identifiable, CaseIterable, RawRepresentable {
     public var id: String {
       switch self {
       case .mp4,
-           .mpeg: rawValue
+        .mpeg:
+        rawValue
       case .asf: "x-ms-asf"
       case .asx: "x-ms-asf"
       case .avi: "x-msvideo"
@@ -211,18 +220,26 @@ public enum MIMEType: Identifiable, CaseIterable, RawRepresentable {
   public static var allCases: [MIMEType] = Application.allCases.compactMap {
     MIMEType.application($0)
   }
-  .appending(contentsOf: Audio.allCases.compactMap {
-    MIMEType.audio($0)
-  })
-  .appending(contentsOf: Image.allCases.compactMap {
-    MIMEType.image($0)
-  })
-  .appending(contentsOf: Text.allCases.compactMap {
-    MIMEType.text($0)
-  })
-  .appending(contentsOf: Video.allCases.compactMap {
-    MIMEType.video($0)
-  })
+  .appending(
+    contentsOf: Audio.allCases.compactMap {
+      MIMEType.audio($0)
+    }
+  )
+  .appending(
+    contentsOf: Image.allCases.compactMap {
+      MIMEType.image($0)
+    }
+  )
+  .appending(
+    contentsOf: Text.allCases.compactMap {
+      MIMEType.text($0)
+    }
+  )
+  .appending(
+    contentsOf: Video.allCases.compactMap {
+      MIMEType.video($0)
+    }
+  )
 
   // // Computed Properties
 

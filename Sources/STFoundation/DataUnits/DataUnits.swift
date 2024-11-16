@@ -5,7 +5,7 @@
 //  Created by Dmitry Mikhaylov on 16.04.2024.
 //
 #if canImport(UIKit)
-  import UIKit
+import UIKit
 
 #endif
 
@@ -41,8 +41,8 @@ public enum DataUnits: String {
   }
 }
 
-public extension UInt64 {
-  func getSizeIn(_ type: DataUnits) -> String {
+extension UInt64 {
+  public func getSizeIn(_ type: DataUnits) -> String {
     var size = 0.0
     switch type {
     case .byte:

@@ -54,15 +54,18 @@ public class Throttle {
   ///   - queue: the queue that job will be executed on, default to main
   public init(
     minimumDelay delay: TimeInterval,
-    queue: DispatchQueue = DispatchQueue.main) {
+    queue: DispatchQueue = DispatchQueue.main
+  ) {
     self.minimumDelay = delay
     self.workingQueue = queue
 
     #if DEBUG
-      if self.minimumDelay < 0.5 {
-        // We suggest minimumDelay to be at least 0.5 second
-        debugPrint("[SwiftThrottle] minimumDelay(\(self.minimumDelay)) less than 0.5s will be inaccurate, last callback not guaranteed")
-      }
+    if self.minimumDelay < 0.5 {
+      // We suggest minimumDelay to be at least 0.5 second
+      debugPrint(
+        "[SwiftThrottle] minimumDelay(\(self.minimumDelay)) less than 0.5s will be inaccurate, last callback not guaranteed"
+      )
+    }
     #endif
   }
 

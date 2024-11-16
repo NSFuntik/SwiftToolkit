@@ -9,26 +9,24 @@ import Foundation
 
 // MARK: - StorageCodable
 
-/**
- This protocol can be implemented instead of `Codable`, when
- you need to store a type in `AppStorage` or `SceneStorage`.
-
- This is a convenience protocol that automatically makes the
- implementing type implement `RawRepresentable`, which means
- that it can be stored in various SwiftUI storages.
-
- The `RawRepresentable` implementations use the `JSONEncoder`
- and `JSONDecoder` to encode and decode the types.
-
- The reason to why `RawRepresentable` is not just applied to
- `Codable` directly, is that some codable types may not want
- to use JSON encoding and decoding.
-
- > Important: Keep in mind that JSON encoding may affect the
- object. For instance, JSON encoding a dynamic `Color` value
- to a raw data representation will remove any light and dark
- mode support, support for high constrasts etc.
- */
+/// This protocol can be implemented instead of `Codable`, when
+/// you need to store a type in `AppStorage` or `SceneStorage`.
+///
+/// This is a convenience protocol that automatically makes the
+/// implementing type implement `RawRepresentable`, which means
+/// that it can be stored in various SwiftUI storages.
+///
+/// The `RawRepresentable` implementations use the `JSONEncoder`
+/// and `JSONDecoder` to encode and decode the types.
+///
+/// The reason to why `RawRepresentable` is not just applied to
+/// `Codable` directly, is that some codable types may not want
+/// to use JSON encoding and decoding.
+///
+/// > Important: Keep in mind that JSON encoding may affect the
+/// object. For instance, JSON encoding a dynamic `Color` value
+/// to a raw data representation will remove any light and dark
+/// mode support, support for high constrasts etc.
 public protocol StorageCodable: Codable, RawRepresentable {
   init?(rawValue: String)
   var rawValue: String { get }
@@ -36,8 +34,8 @@ public protocol StorageCodable: Codable, RawRepresentable {
   init(from decoder: Decoder) throws
 }
 
-public extension StorageCodable {
-  init?(rawValue: String) {
+extension StorageCodable {
+  public init?(rawValue: String) {
     guard
       let data = rawValue.data(using: .utf8),
       let result = try? JSONDecoder().decode(Self.self, from: data)
@@ -45,7 +43,7 @@ public extension StorageCodable {
     self = result
   }
 
-  var rawValue: String {
+  public var rawValue: String {
     guard
       let data = try? JSONEncoder().encode(self),
       let result = String(data: data, encoding: .utf8)

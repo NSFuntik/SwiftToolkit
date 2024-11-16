@@ -1,21 +1,21 @@
 import Foundation
 
-public extension Optional where Wrapped: Collection {
+extension Optional where Wrapped: Collection {
   /// A Boolean value indicating whether the collection is empty.
-  var isEmpty: Bool {
+  public var isEmpty: Bool {
     self?.endIndex == self?.startIndex
   }
 
   /// A Boolean value indicating whether the collection is non-empty.
-  var nonEmpty: Bool {
+  public var nonEmpty: Bool {
     self?.endIndex != self?.startIndex
   }
 }
 
-public extension Array {
+extension Array {
   @inlinable
   /// Returns an optional array that is nil if the array is empty, otherwise returns itself.
-  var nilOrEmpty: Self? {
+  public var nilOrEmpty: Self? {
     isEmpty ? nil : self
   }
 
@@ -24,7 +24,7 @@ public extension Array {
   ///
   /// - Parameter other: The array of elements to append.
   /// - Returns: A new array containing the elements of both arrays.
-  func appending(contentsOf other: [Element]) -> [Element] {
+  public func appending(contentsOf other: [Element]) -> [Element] {
     var result = self
     result.append(contentsOf: other)
     return result
@@ -32,12 +32,12 @@ public extension Array {
 
   @inlinable
   /// The index of the last element in the array.
-  var lastIndex: Int { endIndex - 1 }
+  public var lastIndex: Int { endIndex - 1 }
 }
 
-public extension Collection {
+extension Collection {
   /// Returns an array of tuples containing each element's index and its corresponding value.
-  func indexed() -> [(offset: Int, element: Element)] {
+  public func indexed() -> [(offset: Int, element: Element)] {
     Array(enumerated())
   }
 
@@ -45,7 +45,7 @@ public extension Collection {
   ///
   /// - Parameter transform: A closure that transforms an element asynchronously.
   /// - Returns: An array containing the transformed elements.
-  func asyncMap<T>(
+  public func asyncMap<T>(
     _ transform: (Element) async throws -> T
   ) async rethrows -> [T] {
     var values = [T]()
@@ -59,7 +59,7 @@ public extension Collection {
   ///
   /// - Parameter transform: A closure that transforms an element asynchronously and possibly returns nil.
   /// - Returns: An array containing the non-nil transformed elements.
-  func asyncCompactMap<T>(
+  public func asyncCompactMap<T>(
     _ transform: (Element) async throws -> T?
   ) async rethrows -> [T] {
     var values = [T]()
@@ -72,11 +72,11 @@ public extension Collection {
   }
 }
 
-public extension Array where Element: Identifiable & Equatable, Index == Int {
+extension Array where Element: Identifiable & Equatable, Index == Int {
   /// A subscript that safely retrieves or sets an element at a specified index.
   ///
   /// If the index is out of bounds, it returns nil instead of crashing.
-  subscript(safe index: Int) -> Element? {
+  public subscript(safe index: Int) -> Element? {
     get {
       indices.contains(index) ? self[index] : nil
     }
@@ -95,11 +95,11 @@ public extension Array where Element: Identifiable & Equatable, Index == Int {
   }
 }
 
-public extension RangeReplaceableCollection where Element: Identifiable & Equatable, Index == Int {
+extension RangeReplaceableCollection where Element: Identifiable & Equatable, Index == Int {
   /// A subscript that safely retrieves or sets an element at a specified index.
   ///
   /// If the index is out of bounds, it returns nil instead of crashing.
-  subscript(safe index: Int) -> Element? {
+  public subscript(safe index: Int) -> Element? {
     get {
       indices.contains(index) ? self[index] : nil
     }
@@ -118,9 +118,9 @@ public extension RangeReplaceableCollection where Element: Identifiable & Equata
   }
 }
 
-public extension RangeReplaceableCollection where Index: Hashable {
+extension RangeReplaceableCollection where Index: Hashable {
   /// A Boolean value indicating whether the collection has content.
-  var hasContent: Bool {
+  public var hasContent: Bool {
     !isEmpty
   }
 
@@ -128,13 +128,12 @@ public extension RangeReplaceableCollection where Index: Hashable {
   ///
   /// - Parameter collection: A collection of indices at which to remove elements.
   /// - Returns: The elements that were removed.
-  mutating func removeAll(at collection: some Collection<Index>) -> Self {
+  public mutating func removeAll(at collection: some Collection<Index>) -> Self {
     let indices = Set(collection)
     // Trap if number of elements in the set is different from the collection.
     // Trap if an index is out of range.
     precondition(
-      indices.count == collection.count &&
-        indices.allSatisfy(self.indices.contains)
+      indices.count == collection.count && indices.allSatisfy(self.indices.contains)
     )
     return indices
       .lazy
@@ -152,19 +151,19 @@ public extension RangeReplaceableCollection where Index: Hashable {
   }
 }
 
-public extension Sequence where Iterator.Element: Hashable & Comparable {
+extension Sequence where Iterator.Element: Hashable & Comparable {
   /// Groups the sequence into a dictionary based on a specified property.
   ///
   /// The operation can use any property from the items as the dictionary key.
   ///
   /// - Parameter grouper: A closure that defines the grouping criterion.
   /// - Returns: A dictionary where keys are the result of the grouper closure, and values are arrays of elements.
-  func grouped<T>(by grouper: (Element) -> T) -> [T: [Element]] {
+  public func grouped<T>(by grouper: (Element) -> T) -> [T: [Element]] {
     Dictionary(grouping: self, by: grouper)
   }
 
   /// Returns an array containing the unique elements of the sequence.
-  func unique() -> [Iterator.Element] {
+  public func unique() -> [Iterator.Element] {
     let reduced = reduce(into: Set<Iterator.Element>()) { partialResult, element in
       partialResult.update(with: element)
     }
@@ -175,7 +174,7 @@ public extension Sequence where Iterator.Element: Hashable & Comparable {
   ///
   /// - Parameter areInIncreasingOrder: A closure that defines the comparison for uniqueness.
   /// - Returns: An array containing the unique elements.
-  func unique(by areInIncreasingOrder: (Iterator.Element, Iterator.Element) -> Bool) -> [Iterator.Element] {
+  public func unique(by areInIncreasingOrder: (Iterator.Element, Iterator.Element) -> Bool) -> [Iterator.Element] {
     var uniqueElements: Set<Iterator.Element> = []
     forEach { element in
       if !uniqueElements.contains(where: { areInIncreasingOrder($0, element) }) {
@@ -208,11 +207,11 @@ extension Array where Element: Comparable & Hashable {
   }
 }
 
-public extension Dictionary where Value == Any? {
+extension Dictionary where Value == Any? {
   /// Returns a new dictionary without nil values.
   ///
   /// - Returns: A new dictionary with non-nil values.
-  func removingNilValues() -> [Key: Any] {
+  public func removingNilValues() -> [Key: Any] {
     compactMapValues {
       guard let value = $0 else {
         return nil

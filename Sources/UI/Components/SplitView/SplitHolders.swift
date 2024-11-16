@@ -6,6 +6,7 @@
 //
 
 import Foundation
+
 import protocol Combine.ObservableObject
 
 // MARK: - LayoutHolder
@@ -25,7 +26,8 @@ public class LayoutHolder: ObservableObject {
 
   public var isHorizontal: Bool { value == .horizontal }
 
-  public init(_ layout: SplitLayout? = nil, getter: (() -> SplitLayout)? = nil, setter: ((SplitLayout) -> Void)? = nil) {
+  public init(_ layout: SplitLayout? = nil, getter: (() -> SplitLayout)? = nil, setter: ((SplitLayout) -> Void)? = nil)
+  {
     value = getter?() ?? layout ?? .horizontal
     self.getter = getter
     self.setter = setter
@@ -45,7 +47,8 @@ public class LayoutHolder: ObservableObject {
       },
       setter: { layout in
         UserDefaults.standard.set(layout.rawValue, forKey: key)
-      })
+      }
+    )
   }
 
   public func toggle() {
@@ -79,7 +82,8 @@ public class FractionHolder: ObservableObject {
     FractionHolder(
       fraction,
       getter: { UserDefaults.standard.value(forKey: key) as? CGFloat ?? fraction ?? 0.5 },
-      setter: { fraction in UserDefaults.standard.set(fraction, forKey: key) })
+      setter: { fraction in UserDefaults.standard.set(fraction, forKey: key) }
+    )
   }
 }
 
@@ -164,6 +168,7 @@ public class SideHolder: ObservableObject {
       },
       setter: { side in
         UserDefaults.standard.set(side?.rawValue, forKey: key)
-      })
+      }
+    )
   }
 }

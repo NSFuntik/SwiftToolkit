@@ -13,7 +13,8 @@ public struct TimerView: View {
   public init(
     hours: Binding<Int>,
     minutes: Binding<Int>,
-    seconds: Binding<Int>) {
+    seconds: Binding<Int>
+  ) {
     self._selectedHoursAmount = hours
     self._selectedMinutesAmount = minutes
     self._selectedSecondsAmount = seconds
@@ -49,7 +50,7 @@ public struct TimerView: View {
         }
         .buttonStyle(CircleButtonStyle()).foregroundStyle(.orange, .orange.opacity(0.66))
       case .active,
-           .resumed:
+        .resumed:
         Button("Pause") {
           state = .paused
         }
@@ -91,7 +92,8 @@ public struct TimerView: View {
       minHeight: 200,
       idealHeight: 255,
       maxHeight: 300,
-      alignment: .center)
+      alignment: .center
+    )
     .padding(.all, 32)
   }
 
@@ -152,16 +154,16 @@ public struct TimerView: View {
 
   // MARK: Private Properties
 
-  @State private var timer: Timer? = nil
+  @State private var timer: Timer?
 
   // Powers the ProgressView
   @State var secondsToCompletion = 0
   @State var progress: Float = 0.0
   @State var completionDate = Date.now
 
-  let hoursRange = 0 ... 23
-  let minutesRange = 0 ... 59
-  let secondsRange = 0 ... 59
+  let hoursRange = 0...23
+  let minutesRange = 0...59
+  let secondsRange = 0...59
 
   private func startTimer(total: Int) {
     timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak timer] _ in
@@ -171,7 +173,8 @@ public struct TimerView: View {
 
       debugPrint(
         timer.tolerance.timeString,
-        terminator: " Remaining...")
+        terminator: " Remaining..."
+      )
 
       secondsToCompletion -= 1
       progress = Float(secondsToCompletion) / Float(total)
@@ -288,9 +291,9 @@ extension Int {
 // MARK: - TimerView_Previews
 
 #if swift(>=6.0)
-  @available(iOS 18.0, *)
-  #Preview {
-    @Previewable @State var triggerTimestamp: (h: Int, m: Int, s: Int) = (1, 0, 0)
-    TimerView(hours: $triggerTimestamp.h, minutes: $triggerTimestamp.m, seconds: $triggerTimestamp.s)
-  }
+@available(iOS 18.0, *)
+#Preview {
+  @Previewable @State var triggerTimestamp: (h: Int, m: Int, s: Int) = (1, 0, 0)
+  TimerView(hours: $triggerTimestamp.h, minutes: $triggerTimestamp.m, seconds: $triggerTimestamp.s)
+}
 #endif

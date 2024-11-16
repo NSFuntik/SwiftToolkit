@@ -1,24 +1,24 @@
 import SwiftUI
 
 /// A set of symbols defined by the SF Symbols framework.
-public extension SFSymbol {
+extension SFSymbol {
   /// The name of the symbol.
-  var name: String { return self.rawValue }
+  public var name: String { return self.rawValue }
   /// An image representation of the symbol.
   ///
   /// This property creates an `Image` from the symbol's raw value using the system's image representation.
   @available(iOS 13.4, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
-  var image: Image { return Image(systemName: self.rawValue) }
+  public var image: Image { return Image(systemName: self.rawValue) }
 }
 
 @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
-public extension Image {
+extension Image {
   /// Creates an image using a system symbol.
   ///
   /// - Parameter symbol: The `SFSymbol` to create the image from.
   /// This initializer constructs an `Image` using the symbol's name in the SF Symbols framework.
   @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
-  init(systemName symbol: SFSymbol) {
+  public init(systemName symbol: SFSymbol) {
     self = Image(systemName: symbol.name)
   }
 
@@ -27,7 +27,7 @@ public extension Image {
   /// - Parameter symbol: The `SFSymbol` to create the image from.
   /// This initializer constructs an `Image` using the symbol's name in a slightly different manner.
   @available(iOS 13.0, macOS 11.0, tvOS 13.0, watchOS 6.0, *)
-  init(sf symbol: SFSymbol) {
+  public init(sf symbol: SFSymbol) {
     self = Image(systemName: symbol.name)
   }
 }

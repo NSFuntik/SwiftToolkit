@@ -12,9 +12,9 @@ public struct PresentationStyle {
   fileprivate init(_ style: Style) { _style = style }
 }
 
-public extension PresentationStyle {
-  static var sheet: Self { .init(.sheet) }
-  static var fullScreenCover: Self { .init(.fullScreenCover) }
+extension PresentationStyle {
+  public static var sheet: Self { .init(.sheet) }
+  public static var fullScreenCover: Self { .init(.fullScreenCover) }
 }
 
 // MARK: - PresentationLink
@@ -94,7 +94,9 @@ public struct PresentationLink<Label>: View where Label: View {
       if destinations[valueType] != nil {
         destinations[valueType]?.binding.wrappedValue = value
       } else {
-        print("A PresentationLink is presenting a value of type “\(valueType.type)” but there is no matching presentationDestination declaration visible from the location of the link. The link cannot be activated")
+        print(
+          "A PresentationLink is presenting a value of type “\(valueType.type)” but there is no matching presentationDestination declaration visible from the location of the link. The link cannot be activated"
+        )
       }
     } label: {
       label
@@ -103,7 +105,7 @@ public struct PresentationLink<Label>: View where Label: View {
   }
 }
 
-public extension View {
+extension View {
   /// Associates a destination view with a presented data type for use within
   /// a sheet presentation.
   ///
@@ -134,12 +136,17 @@ public extension View {
   ///     when a `PresentationLink` activates  a value of type `data`.
   ///      The closure takes one argument, which is the value
   ///     of the data to present.
-  func presentationDestination<D: Identifiable, C: View>(for data: D.Type, style: PresentationStyle = .sheet, @ViewBuilder destination: @escaping (D) -> C) -> some View {
+  public func presentationDestination<D: Identifiable, C: View>(
+    for data: D.Type,
+    style: PresentationStyle = .sheet,
+    @ViewBuilder destination: @escaping (D) -> C
+  ) -> some View {
     modifier(
       PresentationModifier(
         ofType: D.self,
         style: style,
-        destination: { destination($0 as! D) })
+        destination: { destination($0 as! D) }
+      )
     )
   }
 }
@@ -150,8 +157,8 @@ private struct PresentationDestinationsEnvironmentKey: EnvironmentKey {
   static var defaultValue: [AnyMetaType: Presentation] = [:]
 }
 
-private extension EnvironmentValues {
-  var presentationDestinations: [AnyMetaType: Presentation] {
+extension EnvironmentValues {
+  fileprivate var presentationDestinations: [AnyMetaType: Presentation] {
     get { self[PresentationDestinationsEnvironmentKey.self] }
     set {
       var current = self[PresentationDestinationsEnvironmentKey.self]
@@ -194,8 +201,8 @@ extension AnyMetaType: Hashable {
   }
 }
 
-private extension Dictionary {
-  subscript(_ key: Any.Type) -> Value? where Key == AnyMetaType {
+extension Dictionary {
+  fileprivate subscript(_ key: Any.Type) -> Value? where Key == AnyMetaType {
     get { self[.init(type: key)] }
     _modify { yield &self[.init(type: key)] }
   }
@@ -226,22 +233,25 @@ private struct PresentationModifier: ViewModifier {
           .sheet(item: $item) { destination($0.value) }
       case .fullScreenCover:
         #if os(iOS) || os(tvOS)
-          if #available(iOS 14, tvOS 14, *) {
-            content
-              .fullScreenCover(item: $item) { destination($0.value) }
-          } else {
-            content
-              .sheet(item: $item) { destination($0.value) }
-          }
-        #else
+        if #available(iOS 14, tvOS 14, *) {
+          content
+            .fullScreenCover(item: $item) { destination($0.value) }
+        } else {
           content
             .sheet(item: $item) { destination($0.value) }
+        }
+        #else
+        content
+          .sheet(item: $item) { destination($0.value) }
         #endif
       }
     }
-    .environment(\.presentationDestinations, [
-      valueType: .init(binding: $item, content: destination),
-    ])
+    .environment(
+      \.presentationDestinations,
+      [
+        valueType: .init(binding: $item, content: destination)
+      ]
+    )
   }
 }
 

@@ -5,8 +5,8 @@
 //  Created by Dmitry Mikhaylov on 20.03.2024.
 //
 
-import Network
 import Combine
+import Network
 
 // MARK: - NetworkStatus
 

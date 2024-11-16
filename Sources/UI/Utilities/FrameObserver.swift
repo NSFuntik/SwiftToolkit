@@ -43,8 +43,13 @@ private struct FrameChangeModifier: ViewModifier {
   }
 }
 
-public extension View {
-  func onFrameChange(coordinateSpace: CoordinateSpace = .global, _ handler: @escaping (CGRect) -> Void) -> some View {
+extension View {
+  public func onFrameChange(
+    coordinateSpace: CoordinateSpace = .global,
+    _ handler: @escaping (CGRect) -> Void
+  )
+    -> some View
+  {
     modifier(FrameChangeModifier(coordinateSpace: coordinateSpace, handler: handler))
   }
 }
@@ -64,9 +69,9 @@ public struct OffsetKey: PreferenceKey {
   }
 }
 
-public extension View {
+extension View {
   @ViewBuilder
-  func scrollOffset(_ coordinateSpace: CoordinateSpace, completion: @escaping (CGRect) -> Void) -> some View {
+  public func scrollOffset(_ coordinateSpace: CoordinateSpace, completion: @escaping (CGRect) -> Void) -> some View {
     overlay {
       GeometryReader {
         let rect = $0.frame(in: coordinateSpace)
@@ -131,9 +136,9 @@ private struct AnimationEndedCallback<Value: VectorArithmetic>: Animatable, View
   }
 }
 
-public extension View {
+extension View {
   @ViewBuilder
-  func checkAnimationEnded(for value: some VectorArithmetic, onEnd: @escaping () -> Void) -> some View {
+  public func checkAnimationEnded(for value: some VectorArithmetic, onEnd: @escaping () -> Void) -> some View {
     modifier(AnimationEndedCallback(for: value, onEnd: onEnd))
   }
 }
