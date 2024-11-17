@@ -1,4 +1,4 @@
-// swift-tools-version: 5.5
+// swift-tools-version: 5.10
 import PackageDescription
 
 let package = Package(
@@ -7,7 +7,6 @@ let package = Package(
     .iOS(.v15),
     .macOS(.v12),
     .tvOS(.v15),
-    .watchOS(.v8),
     .macCatalyst(.v15)
   ],
   products: [
@@ -30,25 +29,19 @@ let package = Package(
       type: .dynamic,
       targets: ["SwiftToolkit"])
   ],
-  dependencies: [
-    .package(
-      url: "https://github.com/SimplyDanny/SwiftLintPlugins", from: "0.57.0")
-  ],
   targets: [
     // Core targets
-    .target(
-      name: "STFoundation"),
-
-    .target(name: "Core", dependencies: ["STFoundation"]),
+    .target(name: "STFoundation", exclude: ["README.md"]),
+    .target(name: "Core", dependencies: ["STFoundation"], exclude: ["README.md"]),
     // Feature targets
-    .target(name: "UI", dependencies: ["Core", "Feedback", "SFSymbols"]),
-    .target(name: "Coordinator"),
-    .target(name: "Feedback", dependencies: ["Core"]),
-    .target(name: "Coding", dependencies: ["Core"]),
-    .target(name: "DI"),
-    .target(name: "Logger", dependencies: ["Core"]),
-    .target(name: "SFSymbols", dependencies: ["Core", "DI"]),
-    .target(name: "CoreDatabase", dependencies: ["Core"]),
+    .target(name: "UI", dependencies: ["Core", "Feedback", "SFSymbols"], exclude: ["README.md"]),
+    .target(name: "Coordinator", exclude: ["README.md"]),
+    .target(name: "Feedback", dependencies: ["Core"], exclude: ["README.md"]),
+    .target(name: "Coding", dependencies: ["Core"], exclude: ["README.md"]),
+    .target(name: "DI", exclude: ["README.md"]),
+    .target(name: "Logger", dependencies: ["Core"], exclude: ["README.md"]),
+    .target(name: "SFSymbols", dependencies: ["Core", "DI"], exclude: ["README.md"]),
+    .target(name: "CoreDatabase", dependencies: ["Core"], exclude: ["CoreDatabase.md"]),
 
     // Umbrella target
     .target(
@@ -61,10 +54,8 @@ let package = Package(
         "DI",
         "Logger",
         "CoreDatabase"
-      ],
-      plugins: [
-        .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
       ]
     )
-  ]
+  ],
+  swiftLanguageVersions: [.v5]
 )

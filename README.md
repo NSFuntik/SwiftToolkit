@@ -1,4 +1,8 @@
 # SwiftToolkit
+![Swift Package Manager](https://img.shields.io/badge/SPM-compatible-brightgreen.svg)
+![Swift Version](https://img.shields.io/badge/swift-5.5-orange.svg)
+![Platforms](https://img.shields.io/badge/platforms-iOS%2015%2B%20%7C%20macOS%2012%2B%20%7C%20tvOS%2015%2B%20%7C%20macCatalyst%2015%2B-blue.svg)
+![License](https://img.shields.io/badge/license-Unlicense-blue.svg)
 
 A comprehensive SwiftUI toolkit for iOS and macOS development.
 
@@ -32,11 +36,11 @@ targets: [
             
             // Add specific module
             
-            .product(name: "STCore", package: "SwiftToolkit"),
+            .product(name: "Core", package: "SwiftToolkit"),
             .product(name: "UI", package: "SwiftToolkit"),
             .product(name: "Coordinator", package: "SwiftToolkit"),
             .product(name: "Feedback", package: "SwiftToolkit"),
-            .product(name: "STCoding", package: "SwiftToolkit"),
+            .product(name: "Coding", package: "SwiftToolkit"),
             .product(name: "DI", package: "SwiftToolkit"),
             .product(name: "Logger", package: "SwiftToolkit"),
             .product(name: "SFSymbols", package: "SwiftToolkit"),
@@ -57,7 +61,7 @@ Each module has its own README with detailed usage instructions:
 - [UI](Sources/UI/README.md)
 - [Coordinator](Sources/Coordinator/README.md)
 - [Feedback](Sources/Feedback/README.md)
-- [STCoding](Sources/STCoding/README.md)
+- [Coding](Sources/Coding/README.md)
 - [DI](Sources/DI/README.md)
 - [Logger](Sources/Logger/README.md)
 - [SFSymbols](Sources/SFSymbols/README.md)
@@ -67,7 +71,6 @@ Each module has its own README with detailed usage instructions:
 - iOS 15.0+
 - macOS 12.0+
 - tvOS 15.0+
-- watchOS 8.0+
 - Swift 5.5+
 
 ## License
