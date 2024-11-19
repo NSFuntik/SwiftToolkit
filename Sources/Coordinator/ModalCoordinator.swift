@@ -26,9 +26,9 @@ public enum ModalStyle {
   case overlay
 
   #if os(macOS)
-  public static var fullScreen: ModalStyle { .sheet }
+    public static var fullScreen: ModalStyle { .sheet }
   #else
-  public static var fullScreen: ModalStyle { .cover }
+    public static var fullScreen: ModalStyle { .cover }
   #endif
 }
 
@@ -59,15 +59,15 @@ public protocol ModalProtocol: Hashable, Identifiable {
   var style: ModalStyle { get }
 }
 
-extension ModalProtocol {
+public extension ModalProtocol {
   /// Default implementation returns .sheet style
-  public var style: ModalStyle { .sheet }
+  var style: ModalStyle { .sheet }
 
   /// Default implementation uses hash value as identifier
-  public var id: Int { hashValue }
+  var id: Int { hashValue }
 }
 
-extension ModalProtocol {
+public extension ModalProtocol {
   /// Returns the coordinator associated with this modal flow, if any
   var coordinator: (any Coordinator)? {
     for child in Mirror(reflecting: self).children {
@@ -128,14 +128,14 @@ public enum PresentationResolve {
   case replaceCurrent
 }
 
-extension ModalCoordinator {
+public extension ModalCoordinator {
   /// Present a flow modally over the current navigation.
   ///
   /// - Parameters:
   ///   - modalFlow: The modal flow to present
   ///   - resolve: The resolution strategy for handling existing presentations
   @MainActor
-  public func present(
+  func present(
     _ modalFlow: Modal,
     resolve: PresentationResolve = .overAll
   ) {
@@ -175,7 +175,7 @@ public struct ModalPresentation {
   /// - Parameters:
   ///   - modalFlow: The modal flow to present
   ///   - destination: Closure returning the view to present
-  init(
+  public init(
     modalFlow: any ModalProtocol,
     destination: @escaping () -> AnyView
   ) {
@@ -211,8 +211,8 @@ private struct ModalModifer: ViewModifier {
       state?.modalPresented?.modalFlow.style == style
     } set: { [weak state] _ in
       if let presented = state?.modalPresented,
-        let overlayPresented = presented.coordinator.state.modalPresented,
-        overlayPresented.modalFlow.style == .overlay
+         let overlayPresented = presented.coordinator.state.modalPresented,
+         overlayPresented.modalFlow.style == .overlay
       {
         presented.coordinator.state.modalPresented = nil
       } else {
@@ -225,7 +225,7 @@ private struct ModalModifer: ViewModifier {
     content
       .overlay {
         if let presented = state.modalPresented,
-          presented.modalFlow.style == .overlay
+           presented.modalFlow.style == .overlay
         {
           presented.destination()
             .coordinateSpace(name: CoordinateSpace.modal)
@@ -235,12 +235,12 @@ private struct ModalModifer: ViewModifier {
         state.modalPresented?.destination()
           .coordinateSpace(name: CoordinateSpace.modal)
       }
-      #if os(iOS)
-    .fullScreenCover(isPresented: isPresentedBinding(.cover)) {
-      state.modalPresented?.destination()
-      .coordinateSpace(name: CoordinateSpace.modal)
-    }
-      #endif
+    #if os(iOS)
+      .fullScreenCover(isPresented: isPresentedBinding(.cover)) {
+        state.modalPresented?.destination()
+          .coordinateSpace(name: CoordinateSpace.modal)
+      }
+    #endif
       .alert(
         state.alerts.last?.title ?? "",
         isPresented: Binding(
@@ -264,7 +264,7 @@ public typealias NavigationModalCoordinator = ModalCoordinator & NavigationCoord
 
 // MARK: - NavigationState.Alert
 
-extension NavigationState {
+public extension NavigationState {
   /// Represents an alert that can be presented by a coordinator.
   struct Alert {
     let title: String
@@ -277,7 +277,7 @@ extension NavigationState {
     ///   - title: The title of the alert
     ///   - actions: A closure that returns the alert's action buttons
     ///   - message: A closure that returns the alert's message view
-    init<A: View, M: View>(
+    public init<A: View, M: View>(
       title: String,
       actions: @escaping () -> A,
       message: @escaping () -> M
@@ -289,12 +289,12 @@ extension NavigationState {
   }
 }
 
-extension View {
+public extension View {
   /// Adds modal presentation capabilities to a view
   /// - Parameter coordinator: The coordinator managing modal presentations
   /// - Returns: A view with modal presentation capabilities
   @MainActor
-  public func withModal<C: Coordinator>(_ coordinator: C) -> some View {
+  func withModal<C: Coordinator>(_ coordinator: C) -> some View {
     modifier(ModalModifer(state: coordinator.state))
       .environmentObject(coordinator.weakReference)
   }
@@ -302,7 +302,7 @@ extension View {
 
 // MARK: - Alert Presentation
 
-extension Coordinator {
+public extension Coordinator {
   /// The default title used for alerts when no specific title is provided
   @usableFromInline internal nonisolated static var defaultAlertTitle: String {
     Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String ?? Bundle.main.infoDictionary?["CFBundleName"]
@@ -314,7 +314,7 @@ extension Coordinator {
   ///   - title: The title of the alert
   ///   - message: A closure that returns the message view
   ///   - actions: A closure that returns the alert actions view
-  public func alert<A: View, M: View>(
+  func alert<A: View, M: View>(
     _ title: String = Self.defaultAlertTitle,
     @ViewBuilder _ message: @escaping () -> M,
     @ViewBuilder actions: @escaping () -> A
@@ -327,7 +327,7 @@ extension Coordinator {
   ///   - title: The title of the alert
   ///   - message: A closure that returns the message view
   @MainActor
-  public func alert<M: View>(
+  func alert<M: View>(
     _ title: String = Self.defaultAlertTitle,
     @ViewBuilder _ message: @escaping () -> M
   ) {
@@ -339,7 +339,7 @@ extension Coordinator {
   ///   - title: The title of the alert
   ///   - message: The message string
   @MainActor
-  public func alert(
+  func alert(
     _ title: String = Self.defaultAlertTitle,
     message: String
   ) {
@@ -352,7 +352,7 @@ extension Coordinator {
   ///   - message: The message string
   ///   - actions: A closure that returns the alert actions view
   @MainActor
-  public func alert<A: View>(
+  func alert<A: View>(
     _ title: String = Self.defaultAlertTitle,
     message: String,
     @ViewBuilder actions: @escaping () -> A
